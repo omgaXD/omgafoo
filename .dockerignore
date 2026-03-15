@@ -1,0 +1,4 @@
+# local DDNS updater (not part of the Docker build)
+update_dns.sh
+.last_ip
+update_dns.log
