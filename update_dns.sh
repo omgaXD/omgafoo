@@ -22,10 +22,10 @@ set +a
 [[ -z "${NAME_COM_API_KEY:-}" ]]   && { echo "ERROR: NAME_COM_API_KEY is not set in .env"   >&2; exit 1; }
 [[ -z "${NAME_COM_USERNAME:-}" ]]  && { echo "ERROR: NAME_COM_USERNAME is not set in .env"  >&2; exit 1; }
 [[ -z "${NAME_COM_DOMAIN:-}" ]]    && { echo "ERROR: NAME_COM_DOMAIN is not set in .env"    >&2; exit 1; }
-[[ -z "${NAME_COM_RECORD_ID:-}" ]] && { echo "ERROR: NAME_COM_RECORD_ID is not set in .env" >&2; exit 1; }
+[[ -z "${NAME_COM_RECORD_IDS:-}" ]] && { echo "ERROR: NAME_COM_RECORD_ID is not set in .env" >&2; exit 1; }
 
 DOMAIN="$NAME_COM_DOMAIN"
-RECORD_ID="$NAME_COM_RECORD_ID"
+RECORD_IDS="$NAME_COM_RECORD_IDS"
 API_BASE="https://api.name.com/core/v1/domains/${DOMAIN}/records"
 
 # ── Register cron job on first run ─────────────────────────────────────────────
@@ -48,32 +48,42 @@ fi
 
 echo "[$(date -Iseconds)] IP changed: ${LAST_IP:-<none>} → $CURRENT_IP"
 
-# ── Fetch existing record to preserve host / ttl ──────────────────────────────
-RECORD_JSON="$(curl -sf --max-time 10 \
-  --user "${NAME_COM_USERNAME}:${NAME_COM_API_KEY}" \
-  "${API_BASE}/${RECORD_ID}")"
+# ── Update each A record ──────────────────────────────────────────────────────
+for RECORD_ID in $(echo "$RECORD_IDS" | tr ',' '\n'); do
+  # Trim whitespace
+  RECORD_ID="${RECORD_ID#"${RECORD_ID%%[![:space:]]*}"}"
+  RECORD_ID="${RECORD_ID%"${RECORD_ID##*[![:space:]]}"}"
 
-if command -v jq &>/dev/null; then
-  REC_HOST="$(echo "$RECORD_JSON" | jq -r '.host // ""')"
-  REC_TTL="$(echo  "$RECORD_JSON" | jq -r '.ttl  // 300')"
-else
-  REC_HOST="$(python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('host',''))"  <<< "$RECORD_JSON")"
-  REC_TTL="$( python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('ttl', 300))" <<< "$RECORD_JSON")"
-fi
+  # ── Fetch existing record to preserve host / ttl ────────────────────────────
+  RECORD_JSON="$(curl -sf --max-time 10 \
+    --user "${NAME_COM_USERNAME}:${NAME_COM_API_KEY}" \
+    "${API_BASE}/${RECORD_ID}")"
 
-# ── Update the A record ───────────────────────────────────────────────────────
-HTTP_CODE="$(curl -s -o /dev/null -w "%{http_code}" \
-  --request PUT \
-  --max-time 10 \
-  --url "${API_BASE}/${RECORD_ID}" \
-  --user "${NAME_COM_USERNAME}:${NAME_COM_API_KEY}" \
-  --header "Content-Type: application/json" \
-  --data "{\"answer\":\"$CURRENT_IP\",\"type\":\"A\",\"host\":\"$REC_HOST\",\"ttl\":$REC_TTL}")"
+  if command -v jq &>/dev/null; then
+    REC_HOST="$(echo "$RECORD_JSON" | jq -r '.host // ""')"
+    REC_TTL="$(echo  "$RECORD_JSON" | jq -r '.ttl  // 300')"
+  else
+    REC_HOST="$(python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('host',''))"  <<< "$RECORD_JSON")"
+    REC_TTL="$( python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('ttl', 300))" <<< "$RECORD_JSON")"
+  fi
 
-if [[ "$HTTP_CODE" == "200" ]]; then
-  echo "$CURRENT_IP" > "$IP_CACHE_FILE"
-  echo "[$(date -Iseconds)] ✓ A record updated → $CURRENT_IP"
-else
-  echo "ERROR: name.com API returned HTTP $HTTP_CODE" >&2
-  exit 1
-fi
+  # ── Update the A record ─────────────────────────────────────────────────────
+  HTTP_CODE="$(curl -s -o /dev/null -w "%{http_code}" \
+    --request PUT \
+    --max-time 10 \
+    --url "${API_BASE}/${RECORD_ID}" \
+    --user "${NAME_COM_USERNAME}:${NAME_COM_API_KEY}" \
+    --header "Content-Type: application/json" \
+    --data "{\"answer\":\"$CURRENT_IP\",\"type\":\"A\",\"host\":\"$REC_HOST\",\"ttl\":$REC_TTL}")"
+
+  if [[ "$HTTP_CODE" == "200" ]]; then
+    echo "[$(date -Iseconds)] ✓ Record $RECORD_ID updated → $CURRENT_IP"
+  else
+    echo "ERROR: name.com API returned HTTP $HTTP_CODE for record $RECORD_ID" >&2
+    exit 1
+  fi
+done
+
+# ── Update cache after all records are successfully updated ────────────────────
+echo "$CURRENT_IP" > "$IP_CACHE_FILE"
+echo "[$(date -Iseconds)] All records updated successfully."
