@@ -10,7 +10,7 @@ services:
     networks:
       - caddy
     labels:
-      caddy: omga.foo
+      caddy: ${DOMAIN_NAME}
       caddy.reverse_proxy: "{{upstreams 80}}"
 
 
