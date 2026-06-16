@@ -12,3 +12,8 @@ services:
     labels:
       caddy: omga.foo
       caddy.reverse_proxy: "{{upstreams 80}}"
+
+
+networks:
+  caddy:
+    external: true
