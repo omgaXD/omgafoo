@@ -26,9 +26,9 @@ func serveFavicon() {
 
 func listenAndServe() {
 	config := GetConfig()
-
-	devPort := ":8080"
-	fmt.Printf("Server starting on http://localhost%s (Mode: %s)\n", devPort, map[bool]string{true: "Development", false: "Production"}[config.IsDev])
+	
+	port := ":" + config.Port
+	fmt.Printf("Server starting on http://localhost%s (Mode: %s)\n", port, map[bool]string{true: "Development", false: "Production"}[config.IsDev])
 	if config.IsDev {
 		fmt.Printf("Ensure 'npm run dev' is running in another terminal.\n")
 	}
@@ -44,6 +44,6 @@ func listenAndServe() {
 		return
 	} else {
 		fmt.Printf("Warning: TLS not configured, running over HTTP.\n")
-		log.Fatal(http.ListenAndServe(devPort, nil))
+		log.Fatal(http.ListenAndServe(port, nil))
 	}
 }

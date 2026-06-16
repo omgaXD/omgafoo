@@ -13,6 +13,7 @@ type Config struct {
 	DomainName string
 	ViteOrigin string
 	WebRoot    string
+	Port	   string
 	Manifest   map[string]ManifestEntry
 }
 
@@ -27,6 +28,10 @@ func GetConfig() Config {
 		certFile := os.Getenv("CERT_FILE")
 		keyFile := os.Getenv("KEY_FILE")
 		domainName := os.Getenv("DOMAIN_NAME")
+		port := os.Getenv("PORT")
+		if port == "" {
+			port = "8080"
+		}
 
 		isDev := env != "production"
 		viteOrigin := "http://localhost:5173" // Default Vite port
@@ -50,6 +55,7 @@ func GetConfig() Config {
 			ViteOrigin: viteOrigin,
 			WebRoot:    webRoot,
 			Manifest:   manifest,
+			Port:	   port,
 		}
 	})
 	return configInstance
