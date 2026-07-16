@@ -23,7 +23,7 @@ export function startRenderLoop() {
 	loop();
 }
 
-export function getInfo(): CanvasCameraInfo {
+export function getCanvasCameraInfo(): CanvasCameraInfo {
 	return {
 		cameraPos: camera.pos,
 		cameraScale: camera.scale,
@@ -39,12 +39,12 @@ let tick = 0;
 function render() {
 	clear();
 
-	const [from, to] = getVisibleChunkPoses(getInfo(), 2);
+	const [from, to] = getVisibleChunkPoses(getCanvasCameraInfo(), 2);
 	drawTiles(() => chunks(from, to));
 
 	drawFeatures(chunks(from, to));
 
-	const tp = canvas2tile(mouse.pos, getInfo());
+	const tp = canvas2tile(mouse.pos, getCanvasCameraInfo());
 	ctx.fillStyle = "#ffff0088";
 	drawHexagon(...getHexagonBounds(tp));
 
@@ -110,8 +110,8 @@ function drawFeature(pos: TilePos, tile: Tile) {
 		case "none":
 			break;
 		case "tree":
-			if (tileHasTag(type, 'water')) break;
-			if (tileHasTag(type, 'desert')) {
+			if (tileHasTag(type, "water")) break;
+			if (tileHasTag(type, "desert")) {
 				ctx.fillStyle = "brown";
 				ctx.fillRect(x + w * 0.4, y + h * 0.6, w * 0.2, h * 0.2);
 				ctx.fillStyle = "lime";
@@ -157,6 +157,6 @@ function clear() {
 }
 
 function getHexagonBounds(pos: TilePos): [number, number, number, number] {
-	const c = $canvas({ type: "crude", x: pos.x - 1, y: pos.y - 2 / 3 }, getInfo());
+	const c = $canvas({ type: "crude", x: pos.x - 1, y: pos.y - 2 / 3 }, getCanvasCameraInfo());
 	return [c.x, c.y, TILE_W * camera.scale, TILE_H * camera.scale];
 }

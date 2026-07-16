@@ -1,8 +1,8 @@
 import type { Controls } from "./controls";
 import { lerp } from "./helpers";
-import type { Camera } from "./types";
+import type { Camera, CrudeTilePos, Vec2 } from "./types";
 
-
+let anchor: Vec2 | null = null;
 
 export const logicCamera: Camera = {
 	pos: {
@@ -18,20 +18,31 @@ export const camera: Camera = {
 	scale: 1,
 };
 
-export function zoom({deltaY}: {deltaY: number}) {
-	logicCamera.scale *= (-deltaY * 0.002 + 1);
+export function zoom({ deltaY }: { deltaY: number }) {
+	const oldScale = logicCamera.scale;
+
+	logicCamera.scale *= -deltaY * 0.002 + 1;
 	logicCamera.scale = Math.min(10, logicCamera.scale);
 	logicCamera.scale = Math.max(0.05, logicCamera.scale);
+
+	if (anchor) {
+		console.log(anchor, logicCamera.pos, oldScale / logicCamera.scale);
+		logicCamera.pos.x = lerp(logicCamera.pos.x, anchor.x, 1 - oldScale / logicCamera.scale);
+		logicCamera.pos.y = lerp(logicCamera.pos.y, anchor.y, 1 - oldScale / logicCamera.scale);
+	}
 }
 
 export function interpolate() {
-	const lambda = 0.1;
+	const lambda = 0.15;
 	camera.pos.x = lerp(camera.pos.x, logicCamera.pos.x, lambda);
 	camera.pos.y = lerp(camera.pos.y, logicCamera.pos.y, lambda);
-	camera.scale = lerp(camera.scale, logicCamera.scale, lambda);
+	if (camera.scale / logicCamera.scale < 1)
+		camera.scale = lerp(camera.scale, logicCamera.scale, 0.1);
+	else 
+		camera.scale = lerp(camera.scale, logicCamera.scale, 0.225);
 }
 
-export function moveCamera(controls: Controls) {
+export function controlCamera(controls: Controls) {
 	const speed = (1 / camera.scale) * 0.25 * (controls.sprint ? 2 : 1);
 	if (controls.right) logicCamera.pos.x += speed;
 	if (controls.left) logicCamera.pos.x -= speed;
@@ -39,3 +50,12 @@ export function moveCamera(controls: Controls) {
 	if (controls.up) logicCamera.pos.y -= speed;
 }
 
+export function moveCamera(by: Vec2) {
+	logicCamera.pos.x += by.x;
+	logicCamera.pos.y += by.y;
+}
+
+export function setAnchor(pos: CrudeTilePos | null) {
+	if (pos === null) anchor = null;
+	else anchor = { ...pos };
+}

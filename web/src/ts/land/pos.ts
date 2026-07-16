@@ -87,6 +87,13 @@ export function canvas2crude(pos: CanvasPos, info: CanvasCameraInfo): CrudeTileP
 	};
 }
 
+export function canvasCanvas2worldDiff(c1: CanvasPos, c2: CanvasPos, info: CanvasCameraInfo): Vec2 {
+	return {
+		x: (c1.x - c2.x) / (TILE_W * 0.5 * info.cameraScale),
+		y: (c1.y - c2.y) / (TILE_H * 0.75 * info.cameraScale)
+	}
+}
+
 export function crude2tile(pos: CrudeTilePos): TilePos {
 	const t1X = Math.round(pos.x / 2) * 2;
 	const t1Y = Math.round(pos.y / 2) * 2;
