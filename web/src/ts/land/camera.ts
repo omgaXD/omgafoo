@@ -26,7 +26,6 @@ export function zoom({ deltaY }: { deltaY: number }) {
 	logicCamera.scale = Math.max(0.05, logicCamera.scale);
 
 	if (anchor) {
-		console.log(anchor, logicCamera.pos, oldScale / logicCamera.scale);
 		logicCamera.pos.x = lerp(logicCamera.pos.x, anchor.x, 1 - oldScale / logicCamera.scale);
 		logicCamera.pos.y = lerp(logicCamera.pos.y, anchor.y, 1 - oldScale / logicCamera.scale);
 	}
