@@ -16,6 +16,7 @@ export default defineConfig({
 				cards: path.resolve(__dirname, "web/src/ts/cards/index.ts"),
 				toneguessr: path.resolve(__dirname, "web/src/ts/toneguessr/index.ts"),
 				grid: path.resolve(__dirname, "web/src/ts/grid/index.ts"),
+				land: path.resolve(__dirname, "web/src/ts/land/index.ts"),
 			},
 		},
 	},
