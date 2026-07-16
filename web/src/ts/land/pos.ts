@@ -6,14 +6,14 @@ function mod(a: number, m: number) {
 	else return a % m;
 }
 
-export function tile2wch(pos: TilePos): WithinChunkPos {
+export function tile2wc(pos: TilePos): WithinChunkPos {
 	return {
 		type: "withinChunk",
 		x: mod((pos.x - mod(pos.y, 2)) / 2, CHUNK_SIZE),
 		y: mod(pos.y, CHUNK_SIZE),
 	};
 }
-export function tile2ch(pos: TilePos): ChunkPos {
+export function tile2c(pos: TilePos): ChunkPos {
 	return {
 		type: "chunk",
 		x: Math.floor((pos.x - mod(pos.y, 2)) / 2 / CHUNK_SIZE),
@@ -123,5 +123,5 @@ export function getVisibleChunkPoses(info: CanvasCameraInfo, outset: number = 0)
 	br.x += outset;
 	br.y += outset;
 
-	return [tile2ch(tl), tile2ch(br)];
+	return [tile2c(tl), tile2c(br)];
 }

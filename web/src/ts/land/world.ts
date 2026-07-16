@@ -1,14 +1,14 @@
 import { CHUNK_SIZE } from "./const";
 import { getType } from "./generation";
-import { cwc2tile, $str, i2wc, tile2ch, tile2wch, wc2i, xy2c } from "./pos";
+import { cwc2tile, $str, i2wc, tile2c, tile2wc, wc2i, xy2c } from "./pos";
 import { encodeTile, type Tile } from "./tile";
 import type { Chunks, StringVec2, Chunk, ChunkPos, TilePos } from "./types";
 
 export const world: Chunks = new Map<StringVec2, Chunk>();
 
 export function tile(pos: TilePos, setTo?: number | Tile): number | undefined {
-	const c = $str(tile2ch(pos));
-	const i = wc2i(tile2wch(pos));
+	const c = $str(tile2c(pos));
+	const i = wc2i(tile2wc(pos));
 	if (!world.has(c)) {
 		return undefined;
 	}
@@ -24,8 +24,8 @@ export function createChunk(pos: ChunkPos) {
 	for (let i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++) {
 		const tile: Tile = {
 			typeIndex: getType(cwc2tile(pos, i2wc(i))),
-			featureIndex: 0
-		}
+			featureIndex: 0,
+		};
 		tiles[i] = encodeTile(tile);
 	}
 	const chunk: Chunk = {
