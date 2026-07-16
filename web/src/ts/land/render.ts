@@ -10,7 +10,7 @@ import {
 	getVisibleChunkPoses,
 	i2wc,
 } from "./pos";
-import { decodeTile, features, tileTypeHasTag as tileHasTag, tileTypes, type Tile, type TileType } from "./tile";
+import { decodeTile, features, tileTypeHasTag as tileHasTag, TileTypeBase, tileTypes, type Tile, type TileType } from "./tile";
 import type { TilePos } from "./types";
 import { chunks, type ChunkGen } from "./world";
 
@@ -37,8 +37,6 @@ let fps: string;
 let tick = 0;
 
 function render() {
-	clear();
-
 	const [from, to] = getVisibleChunkPoses(getCanvasCameraInfo(), 2);
 	drawTiles(() => chunks(from, to));
 
@@ -61,10 +59,22 @@ function render() {
 }
 
 function drawTiles(chunks: () => ChunkGen) {
+	const tileTypeCounts = new Array({length: tileTypes.length}).map((_, i) => 0);
+	for (const [pos, chunk] of chunks()) {
+		if (chunk === undefined) continue;
+		chunk.tileTypeCounts.forEach((c, i) => tileTypeCounts[i]+=c);
+	}
+	const mostCommon = tileTypeCounts.map((c, i) => [c, i] as [number, number]).reduce((prev, cur) => {
+		return cur[0] > prev[0] ? cur : prev;
+	})[1]
+	ctx.fillStyle = determineTileColor(tileTypes[mostCommon]);
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+
 	tileTypes.forEach((tt, i) => {
+		if (i === mostCommon) return;
 		ctx.fillStyle = determineTileColor(tt);
 		ctx.beginPath();
-		for (let [pos, chunk] of chunks()) {
+		for (const [pos, chunk] of chunks()) {
 			if (chunk === undefined) continue;
 			chunk.tiles.forEach((t, j) => {
 				if (decodeTile(t).typeIndex === i) {
@@ -167,11 +177,6 @@ function batchHexagon(x: number, y: number, w: number, h: number) {
 	ctx.lineTo(x + w / 2, y + h);
 	ctx.lineTo(x, y + (3 * h) / 4);
 	ctx.lineTo(x, y + h / 4);
-}
-
-function clear() {
-	ctx.fillStyle = "purple";
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 function getHexagonBounds(pos: TilePos): [number, number, number, number] {

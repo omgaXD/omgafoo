@@ -13,6 +13,7 @@ export type Chunk = {
 	pos: ChunkPos;
 	tiles: Uint8Array;
 	visible: boolean;
+	tileTypeCounts: Uint8Array;
 };
 
 export type Chunks = Map<StringVec2, Chunk>;
