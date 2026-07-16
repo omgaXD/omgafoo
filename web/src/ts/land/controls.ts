@@ -36,12 +36,12 @@ export function registerZoom(zoom: (i : {deltaY: number}) => void) {
 }
 
 canvas.addEventListener('mousedown', (e) => {
-	mouse.l ||= e.button === 0;
+	mouse.l ||= e.button === 0;	
+	mouse.r ||= e.button === 2;
 })
-canvas.addEventListener('contextmenu', (e) => {
-	e.preventDefault();
-	mouse.r ||= true;
-});
+
+canvas.addEventListener('contextmenu', (e) => e.preventDefault())
+
 canvas.addEventListener('mouseup', (e) => {
 	mouse.l &&= e.button !== 0;
 	mouse.r &&= e.button !== 2;
