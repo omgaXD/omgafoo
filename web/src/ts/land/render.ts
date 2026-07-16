@@ -138,12 +138,7 @@ function drawFeature(pos: TilePos, tile: Tile) {
 
 function drawHexagon(x: number, y: number, w: number, h: number) {
 	ctx.beginPath();
-	ctx.moveTo(x + w / 2, y);
-	ctx.lineTo(x + w, y + h / 4);
-	ctx.lineTo(x + w, y + (3 * h) / 4);
-	ctx.lineTo(x + w / 2, y + h);
-	ctx.lineTo(x, y + (3 * h) / 4);
-	ctx.lineTo(x, y + h / 4);
+	batchHexagon(x, y, w, h);
 	ctx.fill();
 }
 
