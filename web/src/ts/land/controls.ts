@@ -44,7 +44,7 @@ canvas.addEventListener('contextmenu', (e) => {
 });
 canvas.addEventListener('mouseup', (e) => {
 	mouse.l &&= e.button !== 0;
-	mouse.r &&= e.button !== 1;
+	mouse.r &&= e.button !== 2;
 })
 
 canvas.addEventListener("mousemove", (e) => {
