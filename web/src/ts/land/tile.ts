@@ -28,7 +28,7 @@ export const tileTypes = [
 ] as const satisfies TileTypeBase[];
 export type TileType = typeof tileTypes[number];
 
-export function tileTypeHasTag(tt: TileTypeBase, tag: TileTag) {
+export function tileTypeHasTag(tt: TileTypeBase | number, tag: TileTag) {
     if (typeof tt === 'number') tt = tileTypes[tt];
     return tt.tileTags.includes(tag);
 }
