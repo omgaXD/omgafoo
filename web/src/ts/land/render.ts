@@ -132,6 +132,24 @@ function drawFeature(pos: TilePos, tile: Tile) {
 			}
 			break;
 		case "stone":
+			if (tileHasTag(type, "water")) ctx.fillStyle = "#4444bb11";
+			else if (tileHasTag(type, "desert")) ctx.fillStyle = "#aa8833";
+			else ctx.fillStyle = "#88aaaa";
+			ctx.beginPath();
+			ctx.moveTo(x + w * 0.5, y + h * 0.3);
+			ctx.lineTo(x + w * 0.8, y + h * 0.5);
+			ctx.lineTo(x + w * 0.7, y + h * 0.8);
+			ctx.lineTo(x + w * 0.3, y + h * 0.8);
+			ctx.lineTo(x + w * 0.2, y + h * 0.5);
+			ctx.fill();
+			if (!tileHasTag(type, "water")) {
+				ctx.fillStyle = "#ffffff22";
+				ctx.beginPath();
+				ctx.moveTo(x + w * 0.5, y + h * 0.3);
+				ctx.lineTo(x + w * 0.3, y + h * 0.8);
+				ctx.lineTo(x + w * 0.2, y + h * 0.5);
+				ctx.fill();
+			}
 			break;
 	}
 }

@@ -14,7 +14,14 @@ export function getType(pos: CrudeTilePos | TilePos): number {
 		})[1];
 
 	const m = 8 * noise(pos, offsetB, 0.15);
-	const featureIndex = features.indexOf((m > 3) ? 'tree' : 'none');
+	const r = 8 * noise(pos, offsetA, 0.15);
+
+	let candidate: Feature;
+	if (m > r) candidate = 'tree';
+	else candidate = 'stone';
+
+	const featureIndex = features.indexOf((Math.max(m, r) > 3) ? candidate : 'none');
+
 
 	return encodeTile({
 		typeIndex,
