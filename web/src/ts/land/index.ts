@@ -71,12 +71,14 @@ function applyBrushlikeAction(mousePosThisTick: CrudeTilePos, mousePosLastTick: 
 	const dist = Math.sqrt(dir.x ** 2 + dir.y ** 2);
 	if (dist > 1) {
 		const normDir: Vec2 = { x: dir.x / dist, y: dir.y / dist };
-		let depth = 100;
-		while (mousePosThisTick.x - curPos.x > 0 === normDir.x > 0 && depth > 0) {
+		let prevDist = Infinity;
+		let newDist = (curPos.x - mousePosThisTick.x) ** 2 + (curPos.y - mousePosThisTick.y) ** 2;
+		while (prevDist > newDist) {
+			action(curPos);
 			curPos.x += normDir.x;
 			curPos.y += normDir.y;
-			action(curPos);
-			depth--;
+			prevDist = newDist;
+			newDist = (curPos.x - mousePosThisTick.x) ** 2 + (curPos.y - mousePosThisTick.y) ** 2;
 		}
 	}
 }
