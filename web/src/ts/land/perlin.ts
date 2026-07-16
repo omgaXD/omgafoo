@@ -1,3 +1,5 @@
+import { lerp } from "./helpers";
+
 const perm = [
 	151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240,
 	21, 10, 23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33, 88,
@@ -34,26 +36,22 @@ export function perlin(x: number, y: number = 0, z: number = 0): number {
 		BB: number = p[B + 1] + Z;
 
 	return lerp(
+		lerp(
+			lerp(grad(p[AA], x, y, z), grad(p[BA], x - 1, y, z), u),
+			lerp(grad(p[AB], x, y - 1, z), grad(p[BB], x - 1, y - 1, z), u),
+			v,
+		),
+		lerp(
+			lerp(grad(p[AA + 1], x, y, z - 1), grad(p[BA + 1], x - 1, y, z - 1), u),
+			lerp(grad(p[AB + 1], x, y - 1, z - 1), grad(p[BB + 1], x - 1, y - 1, z - 1), u),
+			v,
+		),
 		w,
-		lerp(
-			v,
-			lerp(u, grad(p[AA], x, y, z), grad(p[BA], x - 1, y, z)),
-			lerp(u, grad(p[AB], x, y - 1, z), grad(p[BB], x - 1, y - 1, z)),
-		),
-		lerp(
-			v,
-			lerp(u, grad(p[AA + 1], x, y, z - 1), grad(p[BA + 1], x - 1, y, z - 1)),
-			lerp(u, grad(p[AB + 1], x, y - 1, z - 1), grad(p[BB + 1], x - 1, y - 1, z - 1)),
-		),
 	);
 }
 
 function fade(t: number): number {
 	return t * t * t * (t * (t * 6 - 15) + 10);
-}
-
-function lerp(t: number, a: number, b: number): number {
-	return a + t * (b - a);
 }
 
 function grad(hash: number, x: number, y: number, z: number): number {
