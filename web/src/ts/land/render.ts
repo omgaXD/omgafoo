@@ -5,7 +5,7 @@ import { type CanvasCameraInfo, tile2canvas, cwc2tile, getVisibleChunkPoses, i2w
 import { decodeTile, features, tileHasTag, tileTypes, type Tile, type TileType } from "./tile";
 import type { Icon, TilePos } from "./types";
 import { components } from "./ui";
-import { Component } from "./ui/types";
+import { Component, DEFAULT_STYLE, Style } from "./ui/types";
 import { chunks, type ChunkGen } from "./world";
 
 export function startRenderLoop() {
@@ -48,20 +48,29 @@ function drawComponent(component: Component) {
 		case "invisible":
 			break;
 		case "container":
-			ctx.fillStyle = component.drawInfo.color || "#88888888";
-			ctx.fillRect(component.pos.x, component.pos.y, component.w, component.h);
-			break;
 		case "button":
-			ctx.fillStyle = component.drawInfo.color || "#88888888";
+			ctx.fillStyle = determineComponentBgColor(component, DEFAULT_STYLE);
 			ctx.fillRect(component.pos.x, component.pos.y, component.w, component.h);
-			if (component.drawInfo.icon) {
-				drawIcon(component.drawInfo.icon, component.pos.x, component.pos.y, component.w, component.h);
-			}
-			if (component.drawInfo.text) {
-				throw Error();
+			if (component.drawInfo.type === "button") {
+				if (component.drawInfo.icon) {
+					drawIcon(component.drawInfo.icon, component.pos.x, component.pos.y, component.w, component.h);
+				}
+				if (component.drawInfo.text) {
+					throw Error();
+				}
 			}
 			break;
 	}
+}
+
+function determineComponentBgColor(component: Component, style: Style = DEFAULT_STYLE) {
+	if (component.drawInfo.pressable === true) {
+		if (component.drawInfo.isPressed && style.bgColor.pressed) return style.bgColor.pressed;
+	}
+	if (component.drawInfo.selectable === true) {
+		if (component.drawInfo.isSelected && style.bgColor.selected) return style.bgColor.selected;
+	}
+	return style.bgColor.normal;
 }
 
 function drawFps() {

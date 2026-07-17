@@ -14,17 +14,20 @@ export function clickHandler(
 		if (ev.button !== button) return;
 		state = "downInside";
 		toPressedHandler?.(ev);
+		if (component.drawInfo.pressable) component.drawInfo.isPressed = true;
 		ev.cancelled = true;
 	});
 	registerHandler(component, "upElsewhere", (ev) => {
 		if (ev.button !== button) return;
 		if (state === "idle") return;
 		state = "idle";
+		if (component.drawInfo.pressable) component.drawInfo.isPressed = false;
 		pressCanceledHandler?.(ev);
 	});
 	registerHandler(component, "up", (ev) => {
 		if (ev.button !== button) return;
 		if (state === "downInside") {
+			if (component.drawInfo.pressable) component.drawInfo.isPressed = false;
 			clickHandler(ev);
 		}
 	});

@@ -1,73 +1,96 @@
 import { CanvasPos, Icon } from "../types";
 
+export type Style = {
+	textColor: string;
+	bgColor: {
+		normal: string;
+		pressed?: string;
+		selected?: string;
+	};
+};
+
+export const DEFAULT_STYLE: Style = {
+	textColor: "white",
+	bgColor: {
+		normal: "#888888",
+		pressed: "#444444",
+		selected: "#666666",
+	},
+};
+
 export type Component<D extends ComponentDrawInfo = ComponentDrawInfo> = {
-    pos: CanvasPos;
-    w: number;
-    h: number;
-    z: number;
-    drawInfo: D;
-    handlers?: HandlersObject;
+	pos: CanvasPos;
+	w: number;
+	h: number;
+	z: number;
+	drawInfo: D;
+	handlers?: HandlersObject;
 };
 
-export type ComponentDrawInfo = { type: "invisible" } | { type: "container"; color?: string } | ButtonComponent;
-
-export type ButtonComponent = {
-	type: "button";
-	icon?: Icon;
-	text?: string;
-	color?: string;
+type OptionalProp<B extends string, U extends string, T> = {
+	yes: { [key in B]: true } & { [key in U]: T};
+	common: ({ [key in B]: true } & { [key in U]: T }) | ({ [key in B]?: false } & { [key in U]?: never });
 };
+
+export type Pressable = OptionalProp<"pressable", "isPressed", boolean>;
+export type Selectable = OptionalProp<"selectable", "isSelected", boolean>;
+
+export type ButtonComponent = Pressable['yes'] &
+	Selectable['yes'] & {
+		type: "button";
+		icon?: Icon;
+		text?: string;
+	};
+export type ComponentDrawInfo = ({ type: "invisible" } | { type: "container" } | ButtonComponent) & Pressable['common'] & Selectable['common'];
 
 export type MouseButton = "left" | "middle" | "right";
 
 export type CMouseEventBase = {
-    readonly shift: boolean;
-    readonly ctrl: boolean;
-    readonly pos: CanvasPos;
-    cancelled: boolean;
+	readonly shift: boolean;
+	readonly ctrl: boolean;
+	readonly pos: CanvasPos;
+	cancelled: boolean;
 };
 
-
 export type CMouseUpEvent = CMouseEventBase & {
-    type: "up";
-    button: MouseButton;
+	type: "up";
+	button: MouseButton;
 };
 
 export type CMouseUpGlobalEvent = CMouseEventBase & {
-    type: "upElsewhere";
-    button: MouseButton;
+	type: "upElsewhere";
+	button: MouseButton;
 };
 
 export type CMouseDownEvent = CMouseEventBase & {
-    type: "down";
-    button: MouseButton;
+	type: "down";
+	button: MouseButton;
 };
 
 export type CMouseMoveEvent = CMouseEventBase & {
-    type: "move";
-    oldPos: CanvasPos;
+	type: "move";
+	oldPos: CanvasPos;
 };
 export type CMouseEnterEvent = CMouseEventBase & {
-    type: "enter";
-    oldPos: CanvasPos;
+	type: "enter";
+	oldPos: CanvasPos;
 };
 export type CMouseLeaveEvent = CMouseEventBase & {
-    type: "leave";
-    oldPos: CanvasPos;
+	type: "leave";
+	oldPos: CanvasPos;
 };
 
-
 export type CMouseEvent =
-    | CMouseUpEvent
-    | CMouseDownEvent
-    | CMouseMoveEvent
-    | CMouseEnterEvent
-    | CMouseLeaveEvent
-    | CMouseUpGlobalEvent;
+	| CMouseUpEvent
+	| CMouseDownEvent
+	| CMouseMoveEvent
+	| CMouseEnterEvent
+	| CMouseLeaveEvent
+	| CMouseUpGlobalEvent;
 
 export type CMouseEventType = CMouseEvent["type"];
 export type CMouseEventHandler<T extends CMouseEventType> = (ev: CMouseEvent & { type: T }) => void;
 
 export type HandlersObject = Partial<{
-    [T in CMouseEventType]: CMouseEventHandler<T>[];
+	[T in CMouseEventType]: CMouseEventHandler<T>[];
 }>;

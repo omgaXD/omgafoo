@@ -18,7 +18,7 @@ const screen = addComponent({
 	w: 9999,
 	h: 9999,
 	z: 0,
-	drawInfo: { type: "invisible" },
+	drawInfo: { type: "invisible", pressable: false, selectable: false},
 });
 
 let tick = 0;
@@ -31,21 +31,21 @@ const feature1 = addComponent<ButtonComponent>({
 	w: 100,
 	h: 100,
 	z: 1,
-	drawInfo: { type: "button", icon: "x", color: "#888888" },
+	drawInfo: { type: "button", icon: "x", pressable: true, selectable: true, isPressed: false, isSelected: false },
 });
 const feature2 = addComponent<ButtonComponent>({
 	pos: { type: "canvas", x: 120, y: 100 },
 	w: 100,
 	h: 100,
 	z: 1,
-	drawInfo: { type: "button", icon: "tree", color: "#888888" },
+	drawInfo: { type: "button", icon: "tree", pressable: true, selectable: true, isPressed: false, isSelected: false },
 });
 const feature3 = addComponent<ButtonComponent>({
 	pos: { type: "canvas", x: 230, y: 100 },
 	w: 100,
 	h: 100,
 	z: 1,
-	drawInfo: { type: "button", icon: "stone", color: "#888888" },
+	drawInfo: { type: "button", icon: "stone", pressable: true, selectable: true, isPressed: false, isSelected: false },
 });
 
 createRadioGroup("features", {
@@ -54,30 +54,24 @@ createRadioGroup("features", {
 			component: feature1,
 			onSelected: () => {
 				featureIndex = 0;
-				feature1.drawInfo.color = "#666666";
 			},
 			onDeselected: () => {
-				feature1.drawInfo.color = "#888888";
 			},
 		},
 		{
 			component: feature2,
 			onSelected: () => {
 				featureIndex = 1;
-				feature2.drawInfo.color = "#666666";
 			},
 			onDeselected: () => {
-				feature2.drawInfo.color = "#888888";
 			},
 		},
 		{
 			component: feature3,
 			onSelected: () => {
 				featureIndex = 2;
-				feature3.drawInfo.color = "#666666";
 			},
 			onDeselected: () => {
-				feature3.drawInfo.color = "#888888";
 			},
 		},
 	],
