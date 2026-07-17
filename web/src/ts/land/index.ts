@@ -7,6 +7,7 @@ import type { CrudeTilePos, Vec2 } from "./types";
 import { addComponent } from "./ui";
 import { createRadioGroup } from "./ui/radio";
 import { ButtonComponent } from "./ui/types";
+import { uiPos } from "./ui/uiPos";
 import { createChunk, hasChunk, tile } from "./world";
 
 registerZoom(zoom);
@@ -14,9 +15,7 @@ registerZoom(zoom);
 startRenderLoop();
 
 const screen = addComponent({
-	pos: { type: "canvas", x: 0, y: 0 },
-	w: 9999,
-	h: 9999,
+	bounds: uiPos({ type: "lurdwh", left: 0, right: 0, top: 0, bottom: 0 }),
 	z: 0,
 	drawInfo: { type: "invisible", pressable: false, selectable: false },
 });
@@ -27,23 +26,19 @@ let mouseLastTick: Mouse = { ...mouse };
 let mouseWorldPosLastTick: CrudeTilePos = { type: "crude", x: 0, y: 0 };
 
 const feature1 = addComponent<ButtonComponent>({
-	pos: { type: "canvas", x: 10, y: 100 },
-	w: 100,
-	h: 100,
+	bounds: uiPos({ type: "lurdwh", bottom: 10, left: 10, width: 100, height: 100 }),
 	z: 1,
 	drawInfo: { type: "button", icon: "x", pressable: true, selectable: true, isPressed: false, isSelected: false },
 });
 const feature2 = addComponent<ButtonComponent>({
-	pos: { type: "canvas", x: 120, y: 100 },
-	w: 100,
-	h: 100,
+	bounds: uiPos({ type: "lurdwh", bottom: 10, left: 120, width: 100, height: 100 }),
+
 	z: 1,
 	drawInfo: { type: "button", icon: "tree", pressable: true, selectable: true, isPressed: false, isSelected: false },
 });
 const feature3 = addComponent<ButtonComponent>({
-	pos: { type: "canvas", x: 230, y: 100 },
-	w: 100,
-	h: 100,
+	bounds: uiPos({ type: "lurdwh", bottom: 10, left: 230, width: 100, height: 100 }),
+
 	z: 1,
 	drawInfo: { type: "button", icon: "stone", pressable: true, selectable: true, isPressed: false, isSelected: false },
 });

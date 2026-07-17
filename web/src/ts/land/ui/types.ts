@@ -1,4 +1,6 @@
 import { CanvasPos, Icon } from "../types";
+import { ComponentBounds } from "./uiPos";
+
 
 export type Style = {
 	textColor: string;
@@ -19,9 +21,7 @@ export const DEFAULT_STYLE: Style = {
 };
 
 export type Component<D extends ComponentDrawInfo = ComponentDrawInfo> = {
-	pos: CanvasPos;
-	w: number;
-	h: number;
+	bounds: ComponentBounds | (() => ComponentBounds);
 	z: number;
 	drawInfo: D;
 	handlers?: HandlersObject;

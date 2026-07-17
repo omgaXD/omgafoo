@@ -5,6 +5,7 @@ import { type CanvasCameraInfo, tile2canvas, cwc2tile, getVisibleChunkPoses, i2w
 import { decodeTile, features, tileHasTag, tileTypes, type Tile, type TileType } from "./tile";
 import type { Icon, TilePos } from "./types";
 import { components } from "./ui";
+import { extractBounds } from "./ui/component";
 import { Component, DEFAULT_STYLE, Style } from "./ui/types";
 import { chunks, type ChunkGen } from "./world";
 
@@ -57,10 +58,11 @@ function drawComponent(component: Component) {
 		case "container":
 		case "button":
 			ctx.fillStyle = determineComponentBgColor(component, DEFAULT_STYLE);
-			ctx.fillRect(component.pos.x, component.pos.y, component.w, component.h);
+			const bounds = extractBounds(component);
+			ctx.fillRect(bounds.x, bounds.y, bounds.w, bounds.h);
 			if (component.drawInfo.type === "button") {
 				if (component.drawInfo.icon) {
-					drawIcon(component.drawInfo.icon, component.pos.x, component.pos.y, component.w, component.h);
+					drawIcon(component.drawInfo.icon, bounds.x, bounds.y, bounds.w, bounds.h);
 				}
 				if (component.drawInfo.text) {
 					throw Error();

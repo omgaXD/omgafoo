@@ -17,5 +17,4 @@ export type Chunk = {
 };
 export type Icon = "tree" | "palm" | "stone" | "sandstone" | "waterstone" | "x";
 
-
 export type Chunks = Map<StringVec2, Chunk>;

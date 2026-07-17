@@ -1,12 +1,17 @@
 import { CanvasPos } from "../types";
 import { Component, CMouseEventType, CMouseEventHandler } from "./types";
 
+export function extractBounds(component: Component) {
+	return typeof component.bounds === 'function' ? component.bounds() : component.bounds;
+}
+
 export function posWithin(pos: CanvasPos, component: Component) {
+	const bounds = extractBounds(component);
 	return (
-		component.pos.x <= pos.x &&
-		component.pos.y <= pos.y &&
-		pos.x <= component.pos.x + component.w &&
-		pos.y <= component.pos.y + component.h
+		bounds.x <= pos.x &&
+		bounds.y <= pos.y &&
+		pos.x <= bounds.x + bounds.w &&
+		pos.y <= bounds.y + bounds.h
 	);
 }
 
