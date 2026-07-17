@@ -8,6 +8,8 @@ import { components } from "./ui";
 import { Component, DEFAULT_STYLE, Style } from "./ui/types";
 import { chunks, type ChunkGen } from "./world";
 
+export const highlightedTiles: TilePos[] = [];
+
 export function startRenderLoop() {
 	function loop() {
 		interpolate();
@@ -38,6 +40,11 @@ function render() {
 
 	for (const c of components.asc()) {
 		drawComponent(c);
+	}
+
+	ctx.fillStyle = '#ffffff22';
+	for (const tp of highlightedTiles) {
+		drawHexagon(...getHexagonBounds(tp))
 	}
 
 	drawFps();

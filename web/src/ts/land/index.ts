@@ -1,7 +1,7 @@
 import { controlCamera, moveCamera, setAnchor, zoom } from "./camera";
 import { attachMouseController, controls, registerZoom, type Mouse } from "./controls";
-import { xy2c, getVisibleChunkPoses, crude2tile, canvas2crude, canvasCanvas2worldDiff } from "./pos";
-import { getCanvasCameraInfo, startRenderLoop } from "./render";
+import { xy2c, getVisibleChunkPoses, crude2tile, canvas2crude, canvasCanvas2worldDiff, canvas2tile } from "./pos";
+import { getCanvasCameraInfo, highlightedTiles, startRenderLoop } from "./render";
 import { decodeTile, Feature, features } from "./tile";
 import type { CrudeTilePos, Vec2 } from "./types";
 import { addComponent } from "./ui";
@@ -18,7 +18,7 @@ const screen = addComponent({
 	w: 9999,
 	h: 9999,
 	z: 0,
-	drawInfo: { type: "invisible", pressable: false, selectable: false},
+	drawInfo: { type: "invisible", pressable: false, selectable: false },
 });
 
 let tick = 0;
@@ -55,24 +55,21 @@ createRadioGroup("features", {
 			onSelected: () => {
 				featureIndex = 0;
 			},
-			onDeselected: () => {
-			},
+			onDeselected: () => {},
 		},
 		{
 			component: feature2,
 			onSelected: () => {
 				featureIndex = 1;
 			},
-			onDeselected: () => {
-			},
+			onDeselected: () => {},
 		},
 		{
 			component: feature3,
 			onSelected: () => {
 				featureIndex = 2;
 			},
-			onDeselected: () => {
-			},
+			onDeselected: () => {},
 		},
 	],
 	selectedIndex: 0,
@@ -115,6 +112,26 @@ function logic() {
 			applyBrushlikeAction(mousePosThisTick, mousePosLastTick, (pos) => setFeature(pos, features[featureIndex]));
 		}
 	}
+
+	highlightedTiles.length = 0;
+	const pos = canvas2tile(mouse.pos, getCanvasCameraInfo());
+	highlightedTiles.push({ ...pos });
+	highlightedTiles.push({ ...pos });
+	pos.x += 2;
+	highlightedTiles.push({ ...pos });
+	pos.x -= 1;
+	pos.y += 1;
+	highlightedTiles.push({ ...pos });
+	pos.x -= 2;
+	highlightedTiles.push({ ...pos });
+	pos.x -= 1;
+	pos.y -= 1;
+	highlightedTiles.push({ ...pos });
+	pos.x += 1;
+	pos.y -= 1;
+	highlightedTiles.push({ ...pos });
+	pos.x += 2;
+	highlightedTiles.push({ ...pos });
 
 	const [from, to] = getVisibleChunkPoses(getCanvasCameraInfo(), 10);
 
