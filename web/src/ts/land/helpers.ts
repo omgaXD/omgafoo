@@ -34,8 +34,6 @@ export function rnd4tile(min: number, max: number, x: number, y: number, seed: n
 	x %= 1000;
 	y %= 1000;
 	const r = rnd(x + 1000*y + 1000000*seed);
-	if (Math.random() < 0.01)
-	console.log(r);
 	return min + r % (max - min + 1);
 }
 
