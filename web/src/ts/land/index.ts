@@ -5,7 +5,7 @@ import { getCanvasCameraInfo, startRenderLoop } from "./render";
 import { decodeTile, Feature, features } from "./tile";
 import type { CrudeTilePos, Vec2 } from "./types";
 import { addComponent, ButtonComponent, Component, registerHandler } from "./ui";
-import { clickHandler } from "./uiLogic";
+import { clickHandler, radioButton } from "./uiLogic";
 import { createChunk, hasChunk, tile } from "./world";
 
 registerZoom(zoom);
@@ -32,22 +32,57 @@ const feature1 = addComponent<ButtonComponent>({
 	z: 1,
 	drawInfo: { type: "button", icon: "x", color: "#888888" },
 });
+const feature2 = addComponent<ButtonComponent>({
+	pos: { type: "canvas", x: 120, y: 100 },
+	w: 100,
+	h: 100,
+	z: 1,
+	drawInfo: { type: "button", icon: "tree", color: "#888888" },
+});
+const feature3 = addComponent<ButtonComponent>({
+	pos: { type: "canvas", x: 230, y: 100 },
+	w: 100,
+	h: 100,
+	z: 1,
+	drawInfo: { type: "button", icon: "stone", color: "#888888" },
+});
+
+radioButton(
+	feature1,
+	"features",
+	() => {
+		featureIndex = 0;
+		feature1.drawInfo.color = "#666666";
+	},
+	() => {
+		feature1.drawInfo.color = "#888888";
+	},
+);
+
+radioButton(
+	feature2,
+	"features",
+	() => {
+		featureIndex = 1;
+		feature2.drawInfo.color = "#666666";
+	},
+	() => {
+		feature2.drawInfo.color = "#888888";
+	},
+);
+radioButton(
+	feature3,
+	"features",
+	() => {
+		featureIndex = 2;
+		feature3.drawInfo.color = "#666666";
+	},
+	() => {
+		feature3.drawInfo.color = "#888888";
+	},
+);
+
 let featureIndex = 0;
-clickHandler(feature1, 'left', () => {
-	featureIndex = (featureIndex + 1) % features.length;
-	switch (features[featureIndex]) {
-		case "none":
-			feature1.drawInfo.icon = "x";
-			break;
-		case "tree":
-			feature1.drawInfo.icon = "tree";
-			break;
-		case "stone":
-			feature1.drawInfo.icon = "stone";
-			break;
-	}
-	feature1.drawInfo.color = '#888888'
-}, () => {feature1.drawInfo.color = '#444444'}, () => {feature1.drawInfo.color = '#888888'})
 
 function setFeature(pos: CrudeTilePos, feature: Feature) {
 	const tilePos = crude2tile(pos);

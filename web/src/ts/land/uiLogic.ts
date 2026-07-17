@@ -33,3 +33,21 @@ export function clickHandler(
 		if (state === "leftDown") state = "downInside";
 	});
 }
+
+type RadioGroup = {
+	entries: {component: Component, onSelected: (ev: CMouseEvent) => void, onDeselected: () => void}[],
+	selectedIndex: number
+}
+
+const radioGroups: Record<string, RadioGroup> = {};
+export function radioButton(component: Component, group: string, onSelected: (ev: CMouseEvent) => void, onDeselected: () => void) {
+	if (!radioGroups[group]) radioGroups[group] = {entries: [], selectedIndex: -1};
+	const g = radioGroups[group];
+	const index = g.entries.push({component, onSelected, onDeselected}) - 1;
+	clickHandler(component, 'left', (ev) => {
+		if (g.selectedIndex === index) return;
+		if (g.selectedIndex !== -1) g.entries[g.selectedIndex].onDeselected();
+		g.selectedIndex = index;
+		onSelected(ev);
+	})
+}
