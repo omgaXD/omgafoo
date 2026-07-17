@@ -26,15 +26,15 @@ export const tileTypes = [
 		tileTags: ["water"],
 	},
 ] as const satisfies TileTypeBase[];
-export type TileType = typeof tileTypes[number];
+export type TileType = (typeof tileTypes)[number];
 
-export function tileTypeHasTag(tt: TileTypeBase | number, tag: TileTag) {
-    if (typeof tt === 'number') tt = tileTypes[tt];
-    return tt.tileTags.includes(tag);
+export function tileHasTag(tt: TileTypeBase | number, tag: TileTag) {
+	if (typeof tt === "number") tt = tileTypes[tt];
+	return tt.tileTags.includes(tag);
 }
 
 export const features = ["none", "tree", "stone"] as const;
-export type Feature = typeof features[number];
+export type Feature = (typeof features)[number];
 export type Tile = {
 	typeIndex: number;
 	featureIndex: number;

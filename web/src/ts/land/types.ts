@@ -15,5 +15,7 @@ export type Chunk = {
 	visible: boolean;
 	tileTypeCounts: Uint8Array;
 };
+export type Icon = "tree" | "palm" | "stone" | "sandstone" | "waterstone" | "x";
+
 
 export type Chunks = Map<StringVec2, Chunk>;

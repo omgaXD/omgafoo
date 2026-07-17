@@ -1,17 +1,10 @@
 import { camera, interpolate } from "./camera";
 import { canvas, ctx } from "./canvas";
 import { TILE_W, TILE_H } from "./const";
-import { mouse } from "./controls";
-import {
-	type CanvasCameraInfo,
-	tile2canvas as $canvas,
-	canvas2tile,
-	cwc2tile,
-	getVisibleChunkPoses,
-	i2wc,
-} from "./pos";
-import { decodeTile, features, tileTypeHasTag as tileHasTag, TileTypeBase, tileTypes, type Tile, type TileType } from "./tile";
-import type { TilePos } from "./types";
+import { type CanvasCameraInfo, tile2canvas, cwc2tile, getVisibleChunkPoses, i2wc } from "./pos";
+import { decodeTile, features, tileHasTag, tileTypes, type Tile, type TileType } from "./tile";
+import type { Icon, TilePos } from "./types";
+import { Component, components } from "./ui";
 import { chunks, type ChunkGen } from "./world";
 
 export function startRenderLoop() {
@@ -42,10 +35,35 @@ function render() {
 
 	drawFeatures(chunks(from, to));
 
-	const tp = canvas2tile(mouse.pos, getCanvasCameraInfo());
-	ctx.fillStyle = "#ffff0088";
-	drawHexagon(...getHexagonBounds(tp));
+	for (const c of components.reversed()) {
+		drawComponent(c);
+	}
 
+	drawFps();
+}
+
+function drawComponent(component: Component) {
+	switch (component.drawInfo.type) {
+		case "invisible":
+			break;
+		case "container":
+			ctx.fillStyle = "#88888888";
+			ctx.fillRect(component.pos.x, component.pos.y, component.w, component.h);
+			break;
+		case "button":
+			ctx.fillStyle = "#88888888";
+			ctx.fillRect(component.pos.x, component.pos.y, component.w, component.h);
+			if (component.drawInfo.icon) {
+				drawIcon(component.drawInfo.icon, component.pos.x, component.pos.y, component.w, component.h);
+			}
+			if (component.drawInfo.text) {
+				throw Error();
+			}
+			break;
+	}
+}
+
+function drawFps() {
 	ctx.fillStyle = "white";
 	ctx.textBaseline = "top";
 	ctx.font = "bold 40px mono";
@@ -59,14 +77,16 @@ function render() {
 }
 
 function drawTiles(chunks: () => ChunkGen) {
-	const tileTypeCounts = new Array({length: tileTypes.length}).map((_, i) => 0);
-	for (const [pos, chunk] of chunks()) {
+	const tileTypeCounts = new Array({ length: tileTypes.length }).map((_, i) => 0);
+	for (const [, chunk] of chunks()) {
 		if (chunk === undefined) continue;
-		chunk.tileTypeCounts.forEach((c, i) => tileTypeCounts[i]+=c);
+		chunk.tileTypeCounts.forEach((c, i) => (tileTypeCounts[i] += c));
 	}
-	const mostCommon = tileTypeCounts.map((c, i) => [c, i] as [number, number]).reduce((prev, cur) => {
-		return cur[0] > prev[0] ? cur : prev;
-	})[1]
+	const mostCommon = tileTypeCounts
+		.map((c, i) => [c, i] as [number, number])
+		.reduce((prev, cur) => {
+			return cur[0] > prev[0] ? cur : prev;
+		})[1];
 	ctx.fillStyle = determineTileColor(tileTypes[mostCommon]);
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -121,30 +141,45 @@ function drawFeature(pos: TilePos, tile: Tile) {
 			break;
 		case "tree":
 			if (tileHasTag(type, "water")) break;
-			if (tileHasTag(type, "desert")) {
-				ctx.fillStyle = "brown";
-				ctx.fillRect(x + w * 0.4, y + h * 0.6, w * 0.2, h * 0.2);
-				ctx.fillStyle = "lime";
-				ctx.beginPath();
-				ctx.moveTo(x + w * 0.7, y + h * 0.3);
-				ctx.lineTo(x + w * 0.6, y + h * 0.5);
-				ctx.lineTo(x + w * 0.8, y + h * 0.6);
-				ctx.lineTo(x + w * 0.2, y + h * 0.6);
-				ctx.lineTo(x + w * 0.4, y + h * 0.5);
-				ctx.lineTo(x + w * 0.3, y + h * 0.3);
-				ctx.lineTo(x + w * 0.5, y + h * 0.4);
-				ctx.fill();
-			} else {
-				ctx.fillStyle = "brown";
-				ctx.fillRect(x + w * 0.4, y + h * 0.6, w * 0.2, h * 0.2);
-				ctx.fillStyle = "green";
-				ctx.fillRect(x + w * 0.3, y + h * 0.2, w * 0.4, h * 0.4);
-			}
+			if (tileHasTag(type, "desert")) drawIcon("palm", x, y, w, h);
+			else drawIcon("tree", x, y, w, h);
 			break;
 		case "stone":
-			if (tileHasTag(type, "water")) ctx.fillStyle = "#4444bb11";
-			else if (tileHasTag(type, "desert")) ctx.fillStyle = "#aa8833";
-			else ctx.fillStyle = "#88aaaa";
+			if (tileHasTag(type, "water")) drawIcon("waterstone", x, y, w, h);
+			else if (tileHasTag(type, "desert")) drawIcon("sandstone", x, y, w, h);
+			else drawIcon("stone", x, y, w, h);
+			break;
+	}
+}
+
+function drawIcon(icon: Icon, x: number, y: number, w: number, h: number) {
+	switch (icon) {
+		case "palm":
+			ctx.fillStyle = "brown";
+			ctx.fillRect(x + w * 0.4, y + h * 0.6, w * 0.2, h * 0.2);
+			ctx.fillStyle = "lime";
+			ctx.beginPath();
+			ctx.moveTo(x + w * 0.7, y + h * 0.3);
+			ctx.lineTo(x + w * 0.6, y + h * 0.5);
+			ctx.lineTo(x + w * 0.8, y + h * 0.6);
+			ctx.lineTo(x + w * 0.2, y + h * 0.6);
+			ctx.lineTo(x + w * 0.4, y + h * 0.5);
+			ctx.lineTo(x + w * 0.3, y + h * 0.3);
+			ctx.lineTo(x + w * 0.5, y + h * 0.4);
+			ctx.fill();
+			break;
+		case "tree":
+			ctx.fillStyle = "brown";
+			ctx.fillRect(x + w * 0.4, y + h * 0.6, w * 0.2, h * 0.2);
+			ctx.fillStyle = "green";
+			ctx.fillRect(x + w * 0.3, y + h * 0.2, w * 0.4, h * 0.4);
+			break;
+		case "stone":
+		case "sandstone":
+		case "waterstone":
+			if (icon === "stone") ctx.fillStyle = "#88aaaa";
+			if (icon === "sandstone") ctx.fillStyle = "#aa8833";
+			if (icon === "waterstone") ctx.fillStyle = "#4444bb11";
 			ctx.beginPath();
 			ctx.moveTo(x + w * 0.5, y + h * 0.3);
 			ctx.lineTo(x + w * 0.8, y + h * 0.5);
@@ -152,7 +187,7 @@ function drawFeature(pos: TilePos, tile: Tile) {
 			ctx.lineTo(x + w * 0.3, y + h * 0.8);
 			ctx.lineTo(x + w * 0.2, y + h * 0.5);
 			ctx.fill();
-			if (!tileHasTag(type, "water")) {
+			if (icon !== "waterstone") {
 				ctx.fillStyle = "#ffffff22";
 				ctx.beginPath();
 				ctx.moveTo(x + w * 0.5, y + h * 0.3);
@@ -160,6 +195,27 @@ function drawFeature(pos: TilePos, tile: Tile) {
 				ctx.lineTo(x + w * 0.2, y + h * 0.5);
 				ctx.fill();
 			}
+			break;
+		case 'x':
+			ctx.fillStyle = 'black';
+			ctx.beginPath();
+			ctx.moveTo(x + w * 0.2, y + h * 0.2);
+			ctx.lineTo(x + w * 0.3, y + h * 0.2);
+			ctx.lineTo(x + w * 0.5, y + h * 0.4);
+			ctx.lineTo(x + w * 0.7, y + h * 0.2);
+			ctx.lineTo(x + w * 0.8, y + h * 0.2);
+			ctx.lineTo(x + w * 0.8, y + h * 0.3);
+			ctx.lineTo(x + w * 0.6, y + h * 0.5);
+			ctx.lineTo(x + w * 0.8, y + h * 0.7);
+			ctx.lineTo(x + w * 0.8, y + h * 0.8);
+			ctx.lineTo(x + w * 0.7, y + h * 0.8);
+			ctx.lineTo(x + w * 0.5, y + h * 0.6);
+			ctx.lineTo(x + w * 0.3, y + h * 0.8);
+			ctx.lineTo(x + w * 0.2, y + h * 0.8);
+			ctx.lineTo(x + w * 0.2, y + h * 0.7);
+			ctx.lineTo(x + w * 0.4, y + h * 0.5);
+			ctx.lineTo(x + w * 0.2, y + h * 0.3);
+			ctx.fill();
 			break;
 	}
 }
@@ -180,6 +236,6 @@ function batchHexagon(x: number, y: number, w: number, h: number) {
 }
 
 function getHexagonBounds(pos: TilePos): [number, number, number, number] {
-	const c = $canvas({ type: "crude", x: pos.x - 1, y: pos.y - 2 / 3 }, getCanvasCameraInfo());
+	const c = tile2canvas({ type: "crude", x: pos.x - 1, y: pos.y - 2 / 3 }, getCanvasCameraInfo());
 	return [c.x, c.y, TILE_W * camera.scale, TILE_H * camera.scale];
 }
