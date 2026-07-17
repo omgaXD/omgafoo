@@ -31,10 +31,10 @@ export function clickHandler(
 			clickHandler(ev);
 		}
 	});
-	registerHandler(component, "leave", (ev) => {
+	registerHandler(component, "leave", () => {
 		if (state === "downInside") state = "leftDown";
 	});
-	registerHandler(component, "enter", (ev) => {
+	registerHandler(component, "enter", () => {
 		if (state === "leftDown") state = "downInside";
 	});
 }

@@ -87,7 +87,7 @@ function drawFps() {
 }
 
 function drawTiles(chunks: () => ChunkGen) {
-	const tileTypeCounts = new Array({ length: tileTypes.length }).map((_, i) => 0);
+	const tileTypeCounts = new Array({ length: tileTypes.length }).map((_) => 0);
 	for (const [, chunk] of chunks()) {
 		if (chunk === undefined) continue;
 		chunk.tileTypeCounts.forEach((c, i) => (tileTypeCounts[i] += c));
