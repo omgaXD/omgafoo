@@ -38,13 +38,13 @@ function render() {
 
 	drawFeatures(chunks(from, to));
 
-	for (const c of components.asc()) {
-		drawComponent(c);
-	}
-
 	ctx.fillStyle = '#ffffff22';
 	for (const tp of highlightedTiles) {
 		drawHexagon(...getHexagonBounds(tp))
+	}
+
+	for (const c of components.asc()) {
+		drawComponent(c);
 	}
 
 	drawFps();
