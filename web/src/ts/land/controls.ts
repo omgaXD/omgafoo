@@ -19,17 +19,25 @@ export const controls: Controls = {
 
 window.addEventListener("keydown", (e) => {
 	controls.sprint = e.shiftKey;
-	controls.down ||= e.key.toLowerCase() === "s";
-	controls.up ||= e.key.toLowerCase() === "w";
-	controls.left ||= e.key.toLowerCase() === "a";
-	controls.right ||= e.key.toLowerCase() === "d";
+	controls.up ||= e.code === "KeyW";
+	controls.up ||= e.code === "ArrowUp";
+	controls.left ||= e.code === "KeyA";
+	controls.left ||= e.code === "ArrowLeft";
+	controls.down ||= e.code === "KeyS";
+	controls.down ||= e.code === "ArrowDown";
+	controls.right ||= e.code === "KeyD";
+	controls.right ||= e.code === "ArrowRight";
 });
 window.addEventListener("keyup", (e) => {
 	controls.sprint = e.shiftKey;
-	controls.down &&= e.key.toLowerCase() !== "s";
-	controls.up &&= e.key.toLowerCase() !== "w";
-	controls.left &&= e.key.toLowerCase() !== "a";
-	controls.right &&= e.key.toLowerCase() !== "d";
+	controls.up &&= e.code !== "KeyW";
+	controls.up &&= e.code !== "ArrowUp";
+	controls.left &&= e.code !== "KeyA";
+	controls.left &&= e.code !== "ArrowLeft";
+	controls.down &&= e.code !== "KeyS";
+	controls.down &&= e.code !== "ArrowDown";
+	controls.right &&= e.code !== "KeyD";
+	controls.right &&= e.code !== "ArrowRight";
 });
 
 export function registerZoom(zoom: (i: { deltaY: number }) => void) {
@@ -108,7 +116,7 @@ canvas.addEventListener("mouseup", (e) => {
 
 	const button = getButton(e);
 	if (!button) return;
-	
+
 	fireEvent<"upElsewhere">({
 		type: "upElsewhere",
 		button,
