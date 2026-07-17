@@ -1,28 +1,38 @@
 export type TileTypeBase = {
 	name: string;
-	level: number;
+	levelA: number;
+	levelB: number;
 	tileTags: TileTag[];
 };
 export type TileTag = "desert" | "water";
 export const tileTypes = [
 	{
 		name: "grass",
-		level: 0,
+		levelA: 0,
+		levelB: 0,
+		tileTags: [],
+	}, {
+		name: "grass_alt",
+		levelA: 0,
+		levelB: 1,
 		tileTags: [],
 	},
 	{
 		name: "sand",
-		level: 3,
+		levelA: 3,
+		levelB: 0,
 		tileTags: ["desert"],
 	},
 	{
 		name: "water",
-		level: 4,
+		levelA: 4,
+		levelB: 0,
 		tileTags: ["water"],
 	},
 	{
 		name: "deep_water",
-		level: 5,
+		levelA: 5,
+		levelB: 0,
 		tileTags: ["water"],
 	},
 ] as const satisfies TileTypeBase[];

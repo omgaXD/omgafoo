@@ -128,6 +128,8 @@ function determineTileColor(t: TileType): string {
 	switch (t.name) {
 		case "grass":
 			return "#44aa33";
+		case 'grass_alt':
+			return "#33aa22"
 		case "sand":
 			return "#ddaa66";
 		case "water":
