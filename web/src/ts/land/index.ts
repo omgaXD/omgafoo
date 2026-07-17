@@ -15,7 +15,7 @@ registerZoom(zoom);
 startRenderLoop();
 
 const screen = addComponent({
-	bounds: uiPos({ type: "lurdwh", left: 0, right: 0, top: 0, bottom: 0 }),
+	bounds: uiPos({ type: "absolute", left: 0, right: 0, top: 0, bottom: 0 }),
 	z: 0,
 	drawInfo: { type: "invisible", pressable: false, selectable: false },
 });
@@ -26,18 +26,18 @@ let mouseLastTick: Mouse = { ...mouse };
 let mouseWorldPosLastTick: CrudeTilePos = { type: "crude", x: 0, y: 0 };
 
 const feature1 = addComponent<ButtonComponent>({
-	bounds: uiPos({ type: "lurdwh", bottom: 10, left: 10, width: 100, height: 100 }),
+	bounds: uiPos({ type: "absolute", bottom: 10, left: 10, width: 100, height: 100 }),
 	z: 1,
 	drawInfo: { type: "button", icon: "x", pressable: true, selectable: true, isPressed: false, isSelected: false },
 });
 const feature2 = addComponent<ButtonComponent>({
-	bounds: uiPos({ type: "lurdwh", bottom: 10, left: 120, width: 100, height: 100 }),
+	bounds: uiPos({ type: "absolute", bottom: 10, left: 120, width: 100, height: 100 }),
 
 	z: 1,
 	drawInfo: { type: "button", icon: "tree-1", pressable: true, selectable: true, isPressed: false, isSelected: false },
 });
 const feature3 = addComponent<ButtonComponent>({
-	bounds: uiPos({ type: "lurdwh", bottom: 10, left: 230, width: 100, height: 100 }),
+	bounds: uiPos({ type: "absolute", bottom: 10, left: 230, width: 100, height: 100 }),
 
 	z: 1,
 	drawInfo: { type: "button", icon: "stone-1", pressable: true, selectable: true, isPressed: false, isSelected: false },

@@ -1,7 +1,7 @@
 import { canvas } from "../canvas";
 
 export type UIPosSource = {
-	type: "lurdwh";
+	type: "absolute";
 	left?: number;
 	right?: number;
 	top?: number;
@@ -23,7 +23,7 @@ export function uiPos(pos: UIPosSource): () => ComponentBounds {
 		const canvasH = canvas.height;
 
 		switch (pos.type) {
-			case "lurdwh":
+			case "absolute":
 				const xC = def3(pos.left, pos.right, pos.width);
 				if (xC < 2) {
 					throw Error("x axis not enough");
