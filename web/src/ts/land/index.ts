@@ -5,6 +5,7 @@ import { getCanvasCameraInfo, startRenderLoop } from "./render";
 import { decodeTile, Feature, features } from "./tile";
 import type { CrudeTilePos, Vec2 } from "./types";
 import { addComponent, ButtonComponent, Component, registerHandler } from "./ui";
+import { clickHandler } from "./uiLogic";
 import { createChunk, hasChunk, tile } from "./world";
 
 registerZoom(zoom);
@@ -29,28 +30,24 @@ const feature1 = addComponent<ButtonComponent>({
 	w: 100,
 	h: 100,
 	z: 1,
-	drawInfo: { type: "button", icon: "stone" },
+	drawInfo: { type: "button", icon: "x", color: "#888888" },
 });
-let feature: Feature = "tree";
-let startedHere = false;
-registerHandler(feature1, "down", (ev) => {
-	ev.cancelled = true;
-	startedHere = true;
-});
-registerHandler(feature1, "leave", (ev) => {
-	startedHere = false;
-});
-registerHandler(feature1, "up", (ev) => {
-	if (startedHere) {
-		if (feature === "tree") {
-			feature = "stone";
-			feature1.drawInfo.icon = 'tree';
-		} else {
-			feature = "tree";
+let featureIndex = 0;
+clickHandler(feature1, 'left', () => {
+	featureIndex = (featureIndex + 1) % features.length;
+	switch (features[featureIndex]) {
+		case "none":
+			feature1.drawInfo.icon = "x";
+			break;
+		case "tree":
+			feature1.drawInfo.icon = "tree";
+			break;
+		case "stone":
 			feature1.drawInfo.icon = "stone";
-		}
+			break;
 	}
-});
+	feature1.drawInfo.color = '#888888'
+}, () => {feature1.drawInfo.color = '#444444'}, () => {feature1.drawInfo.color = '#888888'})
 
 function setFeature(pos: CrudeTilePos, feature: Feature) {
 	const tilePos = crude2tile(pos);
@@ -82,9 +79,9 @@ function logic() {
 	}
 
 	if (mouse.l) {
-		setFeature(mousePosThisTick, feature);
+		setFeature(mousePosThisTick, features[featureIndex]);
 		if (mouseLastTick.l) {
-			applyBrushlikeAction(mousePosThisTick, mousePosLastTick, (pos) => setFeature(pos, feature));
+			applyBrushlikeAction(mousePosThisTick, mousePosLastTick, (pos) => setFeature(pos, features[featureIndex]));
 		}
 	}
 

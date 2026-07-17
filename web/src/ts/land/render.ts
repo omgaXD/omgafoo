@@ -47,11 +47,11 @@ function drawComponent(component: Component) {
 		case "invisible":
 			break;
 		case "container":
-			ctx.fillStyle = "#88888888";
+			ctx.fillStyle = component.drawInfo.color || "#88888888";
 			ctx.fillRect(component.pos.x, component.pos.y, component.w, component.h);
 			break;
 		case "button":
-			ctx.fillStyle = "#88888888";
+			ctx.fillStyle = component.drawInfo.color || "#88888888";
 			ctx.fillRect(component.pos.x, component.pos.y, component.w, component.h);
 			if (component.drawInfo.icon) {
 				drawIcon(component.drawInfo.icon, component.pos.x, component.pos.y, component.w, component.h);

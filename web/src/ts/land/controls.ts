@@ -108,7 +108,15 @@ canvas.addEventListener("mouseup", (e) => {
 
 	const button = getButton(e);
 	if (!button) return;
-
+	
+	fireEvent<"upElsewhere">({
+		type: "upElsewhere",
+		button,
+		cancelled: false,
+		ctrl: e.ctrlKey,
+		shift: e.shiftKey,
+		pos: mouse.pos,
+	});
 	fireEvent<"up">({
 		type: "up",
 		button,

@@ -13,6 +13,11 @@ type CMouseUpEvent = CMouseEventBase & {
 	button: "left" | "middle" | "right";
 };
 
+type CMouseUpGlobalEvent = CMouseEventBase & {
+	type: "upElsewhere";
+	button: "left" | "middle" | "right";
+}
+
 type CMouseDownEvent = CMouseEventBase & {
 	type: "down";
 	button: "left" | "middle" | "right";
@@ -31,9 +36,9 @@ type CMouseLeaveEvent = CMouseEventBase & {
 	oldPos: CanvasPos;
 };
 
-type CMouseEvent = CMouseUpEvent | CMouseDownEvent | CMouseMoveEvent | CMouseEnterEvent | CMouseLeaveEvent;
+export type CMouseEvent = CMouseUpEvent | CMouseDownEvent | CMouseMoveEvent | CMouseEnterEvent | CMouseLeaveEvent | CMouseUpGlobalEvent;
 type CMouseEventType = CMouseEvent["type"];
-type CMouseEventHandler<T extends CMouseEventType> = (ev: CMouseEvent & { type: T }) => void;
+export type CMouseEventHandler<T extends CMouseEventType> = (ev: CMouseEvent & { type: T }) => void;
 type HandlersObject = Partial<{
 	[T in CMouseEventType]: CMouseEventHandler<T>[];
 }>;
@@ -47,12 +52,13 @@ export type Component<D extends ComponentDrawInfo=ComponentDrawInfo> = {
 	handlers?: HandlersObject;
 };
 
-export type ComponentDrawInfo = { type: "invisible" } | { type: "container" } | ButtonComponent;
+export type ComponentDrawInfo = { type: "invisible" } | { type: "container"; color?: string } | ButtonComponent;
 
 export type ButtonComponent = {
 	type: "button";
 	icon?: Icon;
 	text?: string;
+	color?: string;
 };
 
 export function addComponent<D extends ComponentDrawInfo>(component: Component<D>) {
@@ -107,5 +113,7 @@ function eventAppliesTo(ev: CMouseEvent, component: Component): boolean {
 			return posWithin(ev.pos, component) && !posWithin(ev.oldPos, component);
 		case "leave":
 			return !posWithin(ev.pos, component) && posWithin(ev.oldPos, component);
+		case "upElsewhere":
+			return !posWithin(ev.pos, component);
 	}
 }
