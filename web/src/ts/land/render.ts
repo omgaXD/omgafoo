@@ -4,7 +4,8 @@ import { TILE_W, TILE_H } from "./const";
 import { type CanvasCameraInfo, tile2canvas, cwc2tile, getVisibleChunkPoses, i2wc } from "./pos";
 import { decodeTile, features, tileHasTag, tileTypes, type Tile, type TileType } from "./tile";
 import type { Icon, TilePos } from "./types";
-import { Component, components } from "./ui";
+import { components } from "./ui";
+import { Component } from "./ui/types";
 import { chunks, type ChunkGen } from "./world";
 
 export function startRenderLoop() {
@@ -35,7 +36,7 @@ function render() {
 
 	drawFeatures(chunks(from, to));
 
-	for (const c of components.reversed()) {
+	for (const c of components.asc()) {
 		drawComponent(c);
 	}
 
@@ -196,8 +197,8 @@ function drawIcon(icon: Icon, x: number, y: number, w: number, h: number) {
 				ctx.fill();
 			}
 			break;
-		case 'x':
-			ctx.fillStyle = 'black';
+		case "x":
+			ctx.fillStyle = "black";
 			ctx.beginPath();
 			ctx.moveTo(x + w * 0.2, y + h * 0.2);
 			ctx.lineTo(x + w * 0.3, y + h * 0.2);

@@ -1,5 +1,7 @@
 import type { CanvasPos } from "./types";
-import { Component, fireEvent, registerHandler } from "./ui";
+import { fireEvent } from "./ui";
+import { registerHandler } from "./ui/component";
+import { Component } from "./ui/types";
 
 export type Controls = {
 	right: boolean;

@@ -18,12 +18,12 @@ export class SortedList<T> {
 		this.list.push(item);
 		this.list.sort(this.comparator);
 	}
-	*[Symbol.iterator]() {
+	*asc() {
 		for (const item of this.list) {
 			yield item;
 		}
 	}
-	*reversed() {
+	*desc() {
 		for (let i = this.list.length - 1; i >= 0; i--) {
 			yield this.list[i];
 		}

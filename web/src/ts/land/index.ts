@@ -4,8 +4,9 @@ import { xy2c, getVisibleChunkPoses, crude2tile, canvas2crude, canvasCanvas2worl
 import { getCanvasCameraInfo, startRenderLoop } from "./render";
 import { decodeTile, Feature, features } from "./tile";
 import type { CrudeTilePos, Vec2 } from "./types";
-import { addComponent, ButtonComponent, Component, registerHandler } from "./ui";
-import { clickHandler, radioButton } from "./uiLogic";
+import { addComponent } from "./ui";
+import { createRadioGroup } from "./ui/radio";
+import { ButtonComponent } from "./ui/types";
 import { createChunk, hasChunk, tile } from "./world";
 
 registerZoom(zoom);
@@ -47,40 +48,41 @@ const feature3 = addComponent<ButtonComponent>({
 	drawInfo: { type: "button", icon: "stone", color: "#888888" },
 });
 
-radioButton(
-	feature1,
-	"features",
-	() => {
-		featureIndex = 0;
-		feature1.drawInfo.color = "#666666";
-	},
-	() => {
-		feature1.drawInfo.color = "#888888";
-	},
-);
-
-radioButton(
-	feature2,
-	"features",
-	() => {
-		featureIndex = 1;
-		feature2.drawInfo.color = "#666666";
-	},
-	() => {
-		feature2.drawInfo.color = "#888888";
-	},
-);
-radioButton(
-	feature3,
-	"features",
-	() => {
-		featureIndex = 2;
-		feature3.drawInfo.color = "#666666";
-	},
-	() => {
-		feature3.drawInfo.color = "#888888";
-	},
-);
+createRadioGroup("features", {
+	entries: [
+		{
+			component: feature1,
+			onSelected: () => {
+				featureIndex = 0;
+				feature1.drawInfo.color = "#666666";
+			},
+			onDeselected: () => {
+				feature1.drawInfo.color = "#888888";
+			},
+		},
+		{
+			component: feature2,
+			onSelected: () => {
+				featureIndex = 1;
+				feature2.drawInfo.color = "#666666";
+			},
+			onDeselected: () => {
+				feature2.drawInfo.color = "#888888";
+			},
+		},
+		{
+			component: feature3,
+			onSelected: () => {
+				featureIndex = 2;
+				feature3.drawInfo.color = "#666666";
+			},
+			onDeselected: () => {
+				feature3.drawInfo.color = "#888888";
+			},
+		},
+	],
+	selectedIndex: 0,
+});
 
 let featureIndex = 0;
 
