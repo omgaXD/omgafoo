@@ -9,6 +9,9 @@ export type Controls = {
 	up: boolean;
 	down: boolean;
 	sprint: boolean;
+	one: boolean;
+	two: boolean;
+	three: boolean;
 };
 
 export const controls: Controls = {
@@ -17,6 +20,9 @@ export const controls: Controls = {
 	up: false,
 	down: false,
 	sprint: false,
+	one: false,
+	two: false,
+	three: false,
 };
 
 window.addEventListener("keydown", (e) => {
@@ -29,6 +35,9 @@ window.addEventListener("keydown", (e) => {
 	controls.down ||= e.code === "ArrowDown";
 	controls.right ||= e.code === "KeyD";
 	controls.right ||= e.code === "ArrowRight";
+	controls.one ||= e.code === "Digit1";
+	controls.two ||= e.code === "Digit2";
+	controls.three ||= e.code === "Digit3";
 });
 window.addEventListener("keyup", (e) => {
 	controls.sprint = e.shiftKey;
@@ -40,6 +49,9 @@ window.addEventListener("keyup", (e) => {
 	controls.down &&= e.code !== "ArrowDown";
 	controls.right &&= e.code !== "KeyD";
 	controls.right &&= e.code !== "ArrowRight";
+	controls.one &&= e.code !== "Digit1";
+	controls.two &&= e.code !== "Digit2";
+	controls.three &&= e.code !== "Digit3";
 });
 
 export function registerZoom(zoom: (i: { deltaY: number }) => void) {

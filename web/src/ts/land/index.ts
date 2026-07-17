@@ -1,11 +1,11 @@
 import { controlCamera, moveCamera, setAnchor, zoom } from "./camera";
-import { attachMouseController, controls, registerZoom, type Mouse } from "./controls";
+import { attachMouseController, Controls, controls, registerZoom, type Mouse } from "./controls";
 import { xy2c, getVisibleChunkPoses, crude2tile, canvas2crude, canvasCanvas2worldDiff, canvas2tile } from "./pos";
 import { getCanvasCameraInfo, highlightedTiles, startRenderLoop } from "./render";
 import { decodeTile, Feature, features } from "./tile";
 import type { CrudeTilePos, Vec2 } from "./types";
 import { addComponent } from "./ui";
-import { createRadioGroup } from "./ui/radio";
+import { createBoundRadioGroup, createRadioGroup } from "./ui/radio";
 import { ButtonComponent } from "./ui/types";
 import { uiPos } from "./ui/uiPos";
 import { createChunk, hasChunk, tile } from "./world";
@@ -32,45 +32,33 @@ const feature1 = addComponent<ButtonComponent>({
 });
 const feature2 = addComponent<ButtonComponent>({
 	bounds: uiPos({ type: "absolute", bottom: 10, left: 120, width: 100, height: 100 }),
-
 	z: 1,
-	drawInfo: { type: "button", icon: "tree-1", pressable: true, selectable: true, isPressed: false, isSelected: false },
+	drawInfo: {
+		type: "button",
+		icon: "tree-1",
+		pressable: true,
+		selectable: true,
+		isPressed: false,
+		isSelected: false,
+	},
 });
 const feature3 = addComponent<ButtonComponent>({
 	bounds: uiPos({ type: "absolute", bottom: 10, left: 230, width: 100, height: 100 }),
-
 	z: 1,
-	drawInfo: { type: "button", icon: "stone-1", pressable: true, selectable: true, isPressed: false, isSelected: false },
+	drawInfo: {
+		type: "button",
+		icon: "stone-1",
+		pressable: true,
+		selectable: true,
+		isPressed: false,
+		isSelected: false,
+	},
 });
 
-createRadioGroup("features", {
-	entries: [
-		{
-			component: feature1,
-			onSelected: () => {
-				featureIndex = 0;
-			},
-			onDeselected: () => {},
-		},
-		{
-			component: feature2,
-			onSelected: () => {
-				featureIndex = 1;
-			},
-			onDeselected: () => {},
-		},
-		{
-			component: feature3,
-			onSelected: () => {
-				featureIndex = 2;
-			},
-			onDeselected: () => {},
-		},
-	],
+const featureIndex = {
 	selectedIndex: 0,
-});
-
-let featureIndex = 0;
+};
+createBoundRadioGroup("feature", featureIndex, [feature1, feature2, feature3]);
 
 function setFeature(pos: CrudeTilePos, feature: Feature) {
 	const tilePos = crude2tile(pos);
@@ -82,6 +70,7 @@ function setFeature(pos: CrudeTilePos, feature: Feature) {
 	}
 }
 
+let controlsLastTick: Controls = { ...controls };
 function logic() {
 	const mousePosThisTick = canvas2crude(mouse.pos, getCanvasCameraInfo());
 	const mousePosLastTick = mouseWorldPosLastTick;
@@ -102,10 +91,19 @@ function logic() {
 	}
 
 	if (mouse.l) {
-		setFeature(mousePosThisTick, features[featureIndex]);
+		setFeature(mousePosThisTick, features[featureIndex.selectedIndex]);
 		if (mouseLastTick.l) {
-			applyBrushlikeAction(mousePosThisTick, mousePosLastTick, (pos) => setFeature(pos, features[featureIndex]));
+			applyBrushlikeAction(mousePosThisTick, mousePosLastTick, (pos) =>
+				setFeature(pos, features[featureIndex.selectedIndex]),
+			);
 		}
+	}
+	if (controls.one && !controlsLastTick.one) {
+		featureIndex.selectedIndex = 0;
+	} else if (controls.two && !controlsLastTick.two) {
+		featureIndex.selectedIndex = 1;
+	} else if (controls.three && !controlsLastTick.three) {
+		featureIndex.selectedIndex = 2;
 	}
 
 	highlightedTiles.length = 0;
@@ -139,6 +137,7 @@ function logic() {
 
 	mouseLastTick = { ...mouse, pos: { ...mouse.pos } };
 	mouseWorldPosLastTick = mousePosThisTick;
+	controlsLastTick = { ...controls };
 	tick++;
 }
 
