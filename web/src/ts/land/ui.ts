@@ -38,12 +38,12 @@ type HandlersObject = Partial<{
 	[T in CMouseEventType]: CMouseEventHandler<T>[];
 }>;
 
-export type Component = {
+export type Component<D extends ComponentDrawInfo=ComponentDrawInfo> = {
 	pos: CanvasPos;
 	w: number;
 	h: number;
 	z: number;
-	drawInfo: ComponentDrawInfo;
+	drawInfo: D;
 	handlers?: HandlersObject;
 };
 
@@ -55,7 +55,7 @@ export type ButtonComponent = {
 	text?: string;
 };
 
-export function addComponent(component: Component) {
+export function addComponent<D extends ComponentDrawInfo>(component: Component<D>) {
 	components.insert(component);
 	return component;
 }

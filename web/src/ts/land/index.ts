@@ -4,7 +4,7 @@ import { xy2c, getVisibleChunkPoses, crude2tile, canvas2crude, canvasCanvas2worl
 import { getCanvasCameraInfo, startRenderLoop } from "./render";
 import { decodeTile, Feature, features } from "./tile";
 import type { CrudeTilePos, Vec2 } from "./types";
-import { addComponent, registerHandler } from "./ui";
+import { addComponent, ButtonComponent, Component, registerHandler } from "./ui";
 import { createChunk, hasChunk, tile } from "./world";
 
 registerZoom(zoom);
@@ -24,7 +24,7 @@ const mouse = attachMouseController(screen);
 let mouseLastTick: Mouse = { ...mouse };
 let mouseWorldPosLastTick: CrudeTilePos = { type: "crude", x: 0, y: 0 };
 
-const feature1 = addComponent({
+const feature1 = addComponent<ButtonComponent>({
 	pos: { type: "canvas", x: 10, y: 100 },
 	w: 100,
 	h: 100,
@@ -44,14 +44,10 @@ registerHandler(feature1, "up", (ev) => {
 	if (startedHere) {
 		if (feature === "tree") {
 			feature = "stone";
-			if (feature1.drawInfo.type === 'button') {
-				feature1.drawInfo.icon = 'tree';
-			}
+			feature1.drawInfo.icon = 'tree';
 		} else {
 			feature = "tree";
-			if (feature1.drawInfo.type === "button") {
-				feature1.drawInfo.icon = "stone";
-			}
+			feature1.drawInfo.icon = "stone";
 		}
 	}
 });
