@@ -34,13 +34,13 @@ const feature2 = addComponent<ButtonComponent>({
 	bounds: uiPos({ type: "lurdwh", bottom: 10, left: 120, width: 100, height: 100 }),
 
 	z: 1,
-	drawInfo: { type: "button", icon: "tree", pressable: true, selectable: true, isPressed: false, isSelected: false },
+	drawInfo: { type: "button", icon: "tree-1", pressable: true, selectable: true, isPressed: false, isSelected: false },
 });
 const feature3 = addComponent<ButtonComponent>({
 	bounds: uiPos({ type: "lurdwh", bottom: 10, left: 230, width: 100, height: 100 }),
 
 	z: 1,
-	drawInfo: { type: "button", icon: "stone", pressable: true, selectable: true, isPressed: false, isSelected: false },
+	drawInfo: { type: "button", icon: "stone-1", pressable: true, selectable: true, isPressed: false, isSelected: false },
 });
 
 createRadioGroup("features", {

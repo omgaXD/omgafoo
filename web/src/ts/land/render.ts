@@ -1,6 +1,7 @@
 import { camera, interpolate } from "./camera";
 import { canvas, ctx } from "./canvas";
 import { TILE_W, TILE_H } from "./const";
+import { rnd4tile } from "./helpers";
 import { type CanvasCameraInfo, tile2canvas, cwc2tile, getVisibleChunkPoses, i2wc } from "./pos";
 import { decodeTile, features, tileHasTag, tileTypes, type Tile, type TileType } from "./tile";
 import type { Icon, TilePos } from "./types";
@@ -39,9 +40,9 @@ function render() {
 
 	drawFeatures(chunks(from, to));
 
-	ctx.fillStyle = '#ffffff22';
+	ctx.fillStyle = "#ffffff22";
 	for (const tp of highlightedTiles) {
-		drawHexagon(...getHexagonBounds(tp))
+		drawHexagon(...getHexagonBounds(tp));
 	}
 
 	for (const c of components.asc()) {
@@ -130,8 +131,8 @@ function determineTileColor(t: TileType): string {
 	switch (t.name) {
 		case "grass":
 			return "#44aa33";
-		case 'grass_alt':
-			return "#33aa22"
+		case "grass_alt":
+			return "#33aa22";
 		case "sand":
 			return "#ddaa66";
 		case "water":
@@ -161,14 +162,16 @@ function drawFeature(pos: TilePos, tile: Tile) {
 		case "none":
 			break;
 		case "tree":
+			const treeSubtype = rnd4tile(1, 2, pos.x, pos.y, 123) as 1 | 2;
 			if (tileHasTag(type, "water")) break;
 			if (tileHasTag(type, "desert")) drawIcon("palm", x, y, w, h);
-			else drawIcon("tree", x, y, w, h);
+			else drawIcon(`tree-${treeSubtype}`, x, y, w, h);
 			break;
 		case "stone":
-			if (tileHasTag(type, "water")) drawIcon("waterstone", x, y, w, h);
-			else if (tileHasTag(type, "desert")) drawIcon("sandstone", x, y, w, h);
-			else drawIcon("stone", x, y, w, h);
+			const stoneSubtype = rnd4tile(1, 2, pos.x, pos.y, 123) as 1 | 2;
+			if (tileHasTag(type, "water")) drawIcon(`waterstone-${stoneSubtype}`, x, y, w, h);
+			else if (tileHasTag(type, "desert")) drawIcon(`sandstone-${stoneSubtype}`, x, y, w, h);
+			else drawIcon(`stone-${stoneSubtype}`, x, y, w, h);
 			break;
 	}
 }
@@ -189,29 +192,35 @@ function drawIcon(icon: Icon, x: number, y: number, w: number, h: number) {
 			ctx.lineTo(x + w * 0.5, y + h * 0.4);
 			ctx.fill();
 			break;
-		case "tree":
+		case "tree-1":
+		case "tree-2":
+			const treeOffset = icon[5] === "1" ? 0 : 0.1;
 			ctx.fillStyle = "brown";
-			ctx.fillRect(x + w * 0.4, y + h * 0.6, w * 0.2, h * 0.2);
+			ctx.fillRect(x + w * 0.4, y + h * (0.6 + treeOffset), w * 0.2, h * 0.2);
 			ctx.fillStyle = "green";
-			ctx.fillRect(x + w * 0.3, y + h * 0.2, w * 0.4, h * 0.4);
+			ctx.fillRect(x + w * (0.3 + treeOffset/2), y + h * 0.2, w * (0.4 - treeOffset), h * (0.4 + treeOffset));
 			break;
-		case "stone":
-		case "sandstone":
-		case "waterstone":
-			if (icon === "stone") ctx.fillStyle = "#88aaaa";
-			if (icon === "sandstone") ctx.fillStyle = "#aa8833";
-			if (icon === "waterstone") ctx.fillStyle = "#4444bb11";
+		case "stone-1":
+		case "stone-2":
+		case "sandstone-1":
+		case "sandstone-2":
+		case "waterstone-1":
+		case "waterstone-2":
+			if (icon.startsWith("stone-")) ctx.fillStyle = "#88aaaa";
+			if (icon.startsWith("sandstone-")) ctx.fillStyle = "#aa8833";
+			if (icon.startsWith("waterstone-")) ctx.fillStyle = "#4444bb11";
 			ctx.beginPath();
-			ctx.moveTo(x + w * 0.5, y + h * 0.3);
+			const stoneOffset = icon[6] === "1" ? 0.1 : -0.1;
+			ctx.moveTo(x + w * (0.5 + stoneOffset), y + h * 0.3);
 			ctx.lineTo(x + w * 0.8, y + h * 0.5);
 			ctx.lineTo(x + w * 0.7, y + h * 0.8);
 			ctx.lineTo(x + w * 0.3, y + h * 0.8);
 			ctx.lineTo(x + w * 0.2, y + h * 0.5);
 			ctx.fill();
-			if (icon !== "waterstone") {
+			if (!icon.startsWith("waterstone")) {
 				ctx.fillStyle = "#ffffff22";
 				ctx.beginPath();
-				ctx.moveTo(x + w * 0.5, y + h * 0.3);
+				ctx.moveTo(x + w * (0.5 + stoneOffset), y + h * 0.3);
 				ctx.lineTo(x + w * 0.3, y + h * 0.8);
 				ctx.lineTo(x + w * 0.2, y + h * 0.5);
 				ctx.fill();

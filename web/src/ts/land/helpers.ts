@@ -29,3 +29,19 @@ export class SortedList<T> {
 		}
 	}
 }
+
+export function rnd4tile(min: number, max: number, x: number, y: number, seed: number) {
+	x %= 1000;
+	y %= 1000;
+	const r = rnd(x + 1000*y + 1000000*seed);
+	if (Math.random() < 0.01)
+	console.log(r);
+	return min + r % (max - min + 1);
+}
+
+export function rnd(seed: number) {
+	let m = 0x80000001,
+		a = 1103515245,
+		c = 12345;
+	return (a * seed + c) % m;
+}
