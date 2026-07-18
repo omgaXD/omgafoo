@@ -1,3 +1,5 @@
+import { CrudeTilePos, Vec2 } from "./types";
+
 export function lerp(a: number, b: number, lambda: number) {
 	return b * lambda + a * (1 - lambda);
 }
@@ -42,4 +44,34 @@ export function rnd(seed: number) {
 		a = 1103515245,
 		c = 12345;
 	return (a * seed + c) % m;
+}
+
+export function splitCircle<T extends number>(pieces: T, offsetDeg: number = 0): (Vec2[] & {length: T}) {
+	return Array.from({length: pieces}).map((_, i) => {
+		const angle = (i + offsetDeg / 360) * Math.PI * 2/ pieces;
+		return {x: Math.cos(angle), y: Math.sin(angle)};
+	}) as (Vec2[] & {length: T})
+}
+
+
+export function applyBrushlikeAction(
+	mousePosThisTick: CrudeTilePos,
+	mousePosLastTick: CrudeTilePos,
+	action: (pos: CrudeTilePos) => void,
+) {
+	const curPos = { ...mousePosLastTick };
+	const dir: Vec2 = { x: mousePosThisTick.x - curPos.x, y: mousePosThisTick.y - curPos.y };
+	const dist = Math.sqrt(dir.x ** 2 + dir.y ** 2);
+	if (dist > 1) {
+		const normDir: Vec2 = { x: dir.x / dist, y: dir.y / dist };
+		let prevDist = Infinity;
+		let newDist = (curPos.x - mousePosThisTick.x) ** 2 + (curPos.y - mousePosThisTick.y) ** 2;
+		while (prevDist > newDist) {
+			action(curPos);
+			curPos.x += normDir.x;
+			curPos.y += normDir.y;
+			prevDist = newDist;
+			newDist = (curPos.x - mousePosThisTick.x) ** 2 + (curPos.y - mousePosThisTick.y) ** 2;
+		}
+	}
 }

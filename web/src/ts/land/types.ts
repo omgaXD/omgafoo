@@ -25,6 +25,12 @@ export type Icon =
 	| "sandstone-2"
 	| "waterstone-1"
 	| "waterstone-2"
-	| "x";
+	| "x"
+	| "waterWheel"
+	| "waterWheel-animated"
+	| "connector"
+	| "rockCutter"
+	| "big-0"
+	| "big-180"
 
 export type Chunks = Map<StringVec2, Chunk>;

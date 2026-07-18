@@ -1,18 +1,21 @@
+import { canPlaceBuilding } from "./buildingLogic";
 import { controlCamera, moveCamera, setAnchor, zoom } from "./camera";
 import { attachMouseController, Controls, controls, registerZoom, type Mouse } from "./controls";
-import { xy2c, getVisibleChunkPoses, crude2tile, canvas2crude, canvasCanvas2worldDiff, canvas2tile } from "./pos";
-import { getCanvasCameraInfo, highlightedTiles, startRenderLoop } from "./render";
-import { decodeTile, Feature, features } from "./tile";
+import { xy2c, getVisibleChunkPoses, canvas2crude, canvasCanvas2worldDiff, canvas2tile } from "./pos";
+import { getCanvasCameraInfo, startRenderLoop } from "./render";
+import { State } from "./state";
 import type { CrudeTilePos, Vec2 } from "./types";
 import { addComponent } from "./ui";
-import { createBoundRadioGroup, createRadioGroup } from "./ui/radio";
-import { ButtonComponent } from "./ui/types";
+import { initMainScreen } from "./ui/main";
 import { uiPos } from "./ui/uiPos";
-import { createChunk, hasChunk, tile } from "./world";
+import { createChunk, hasChunk, placeBuilding } from "./world";
 
 registerZoom(zoom);
-
-startRenderLoop();
+const state: State = {
+	highlightedTiles: { danger: [], info: [], success: [] },
+	buildingPreviews: [],
+};
+startRenderLoop(state);
 
 const screen = addComponent({
 	bounds: uiPos({ type: "absolute", left: 0, right: 0, top: 0, bottom: 0 }),
@@ -24,56 +27,12 @@ let tick = 0;
 const mouse = attachMouseController(screen);
 let mouseLastTick: Mouse = { ...mouse };
 let mouseWorldPosLastTick: CrudeTilePos = { type: "crude", x: 0, y: 0 };
-
-const feature1 = addComponent<ButtonComponent>({
-	bounds: uiPos({ type: "absolute", bottom: 10, left: 10, width: 100, height: 100 }),
-	z: 1,
-	drawInfo: { type: "button", icon: "x", pressable: true, selectable: true, isPressed: false, isSelected: false },
-});
-const feature2 = addComponent<ButtonComponent>({
-	bounds: uiPos({ type: "absolute", bottom: 10, left: 120, width: 100, height: 100 }),
-	z: 1,
-	drawInfo: {
-		type: "button",
-		icon: "tree-1",
-		pressable: true,
-		selectable: true,
-		isPressed: false,
-		isSelected: false,
-	},
-});
-const feature3 = addComponent<ButtonComponent>({
-	bounds: uiPos({ type: "absolute", bottom: 10, left: 230, width: 100, height: 100 }),
-	z: 1,
-	drawInfo: {
-		type: "button",
-		icon: "stone-1",
-		pressable: true,
-		selectable: true,
-		isPressed: false,
-		isSelected: false,
-	},
-});
-
-const featureIndex = {
-	selectedIndex: 0,
-};
-createBoundRadioGroup("feature", featureIndex, [feature1, feature2, feature3]);
-
-function setFeature(pos: CrudeTilePos, feature: Feature) {
-	const tilePos = crude2tile(pos);
-	const t = tile(tilePos);
-	if (t !== undefined) {
-		const d = decodeTile(t);
-		d.featureIndex = features.indexOf(feature);
-		tile(tilePos, d);
-	}
-}
-
 let controlsLastTick: Controls = { ...controls };
+
+const building = initMainScreen();
+
 function logic() {
 	const mousePosThisTick = canvas2crude(mouse.pos, getCanvasCameraInfo());
-	const mousePosLastTick = mouseWorldPosLastTick;
 
 	setAnchor(mousePosThisTick);
 	if (mouse.r) {
@@ -91,40 +50,36 @@ function logic() {
 	}
 
 	if (mouse.l) {
-		setFeature(mousePosThisTick, features[featureIndex.selectedIndex]);
-		if (mouseLastTick.l) {
-			applyBrushlikeAction(mousePosThisTick, mousePosLastTick, (pos) =>
-				setFeature(pos, features[featureIndex.selectedIndex]),
-			);
+		if (state.buildingPreviews) {
+			if (!state.buildingPreviews.some((bp) => !canPlaceBuilding(bp[0].b, bp[1]))) {
+				state.buildingPreviews.forEach((bp) => {
+					placeBuilding(...bp);
+				});
+				state.buildingPreviews.length = 0;
+				building.selectedIndex = 0;
+			}
 		}
 	}
-	if (controls.one && !controlsLastTick.one) {
-		featureIndex.selectedIndex = 0;
-	} else if (controls.two && !controlsLastTick.two) {
-		featureIndex.selectedIndex = 1;
-	} else if (controls.three && !controlsLastTick.three) {
-		featureIndex.selectedIndex = 2;
-	}
 
-	highlightedTiles.length = 0;
+	state.highlightedTiles.danger.length = 0;
+	state.highlightedTiles.info.length = 0;
+	state.highlightedTiles.success.length = 0;
+
 	const pos = canvas2tile(mouse.pos, getCanvasCameraInfo());
-	highlightedTiles.push({ ...pos });
-	highlightedTiles.push({ ...pos });
-	pos.x += 2;
-	highlightedTiles.push({ ...pos });
-	pos.x -= 1;
-	pos.y += 1;
-	highlightedTiles.push({ ...pos });
-	pos.x -= 2;
-	highlightedTiles.push({ ...pos });
-	pos.x -= 1;
-	pos.y -= 1;
-	highlightedTiles.push({ ...pos });
-	pos.x += 1;
-	pos.y -= 1;
-	highlightedTiles.push({ ...pos });
-	pos.x += 2;
-	highlightedTiles.push({ ...pos });
+	
+	if (building.selectedIndex === 1) {
+		const canPlace = canPlaceBuilding('waterWheel', pos);
+		state.buildingPreviews = [
+			[
+				{ b: "waterWheel", preview: canPlace ? "allowed" : "disallowed", rotation: 0 },
+				{ ...pos},
+			],
+		];
+		state.highlightedTiles[canPlace ? 'success' : 'danger'] = [{...pos}];
+	} else {
+		state.buildingPreviews.length = 0;
+		state.highlightedTiles.info = [{...pos}];
+	}
 
 	const [from, to] = getVisibleChunkPoses(getCanvasCameraInfo(), 10);
 
@@ -142,24 +97,3 @@ function logic() {
 }
 
 setInterval(logic, 50);
-function applyBrushlikeAction(
-	mousePosThisTick: CrudeTilePos,
-	mousePosLastTick: CrudeTilePos,
-	action: (pos: CrudeTilePos) => void,
-) {
-	const curPos = { ...mousePosLastTick };
-	const dir: Vec2 = { x: mousePosThisTick.x - curPos.x, y: mousePosThisTick.y - curPos.y };
-	const dist = Math.sqrt(dir.x ** 2 + dir.y ** 2);
-	if (dist > 1) {
-		const normDir: Vec2 = { x: dir.x / dist, y: dir.y / dist };
-		let prevDist = Infinity;
-		let newDist = (curPos.x - mousePosThisTick.x) ** 2 + (curPos.y - mousePosThisTick.y) ** 2;
-		while (prevDist > newDist) {
-			action(curPos);
-			curPos.x += normDir.x;
-			curPos.y += normDir.y;
-			prevDist = newDist;
-			newDist = (curPos.x - mousePosThisTick.x) ** 2 + (curPos.y - mousePosThisTick.y) ** 2;
-		}
-	}
-}

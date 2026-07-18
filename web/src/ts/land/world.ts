@@ -1,10 +1,12 @@
+import { BuildingData, PreviewBuildingData } from "./building";
 import { CHUNK_SIZE } from "./const";
 import { getType } from "./generation";
-import { cwc2tile, $str, i2wc, tile2c, tile2wc, wc2i, xy2c } from "./pos";
+import { cwc2tile, $str, i2wc, tile2c, tile2wc, wc2i, xy2c, $unstr } from "./pos";
 import { encodeTile, tileTypes, type Tile } from "./tile";
 import type { Chunks, StringVec2, Chunk, ChunkPos, TilePos } from "./types";
 
 export const world: Chunks = new Map<StringVec2, Chunk>();
+export const placedBuildings = new Map<StringVec2, BuildingData>();
 
 export function tile(pos: TilePos, setTo?: number | Tile): number | undefined {
 	const c = $str(tile2c(pos));
@@ -35,7 +37,7 @@ export function createChunk(pos: ChunkPos) {
 		visible: true,
 		pos,
 		tiles,
-		tileTypeCounts
+		tileTypeCounts,
 	};
 
 	world.set($str(pos), chunk);
@@ -51,11 +53,26 @@ export function getChunk(pos: ChunkPos) {
 }
 
 export type ChunkGen = Generator<[ChunkPos, Chunk | undefined]>;
-export function* chunks(from: ChunkPos, to: ChunkPos): ChunkGen {
+export function* chunkGen(from: ChunkPos, to: ChunkPos): ChunkGen {
 	for (let x = from.x; x <= to.x; x++) {
 		for (let y = from.y; y <= to.y; y++) {
 			const pos = xy2c(x, y);
 			yield [pos, getChunk(pos)] as [ChunkPos, Chunk | undefined];
 		}
 	}
+}
+
+export type BuildingGen = Generator<[TilePos, BuildingData]>;
+export function* buildingGen(from: ChunkPos, to: ChunkPos): BuildingGen {
+	for (const [stp, b] of placedBuildings) {
+		const tp: TilePos = { type: 'tile', ...$unstr(stp) };
+		const c = tile2c(tp);
+		if (from.x <= c.x && c.x <= to.x && from.y <= c.y && c.y <= to.y) {
+			yield [tp, b];
+		}
+	}
+}
+
+export function placeBuilding(b: PreviewBuildingData, tp: TilePos) {
+	placedBuildings.set($str(tp), b);
 }

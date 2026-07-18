@@ -1,21 +1,21 @@
+import { buildings, PreviewBuildingData } from "./building";
 import { camera, interpolate } from "./camera";
 import { canvas, ctx } from "./canvas";
 import { TILE_W, TILE_H } from "./const";
-import { rnd4tile } from "./helpers";
+import { rnd4tile, splitCircle } from "./helpers";
 import { type CanvasCameraInfo, tile2canvas, cwc2tile, getVisibleChunkPoses, i2wc } from "./pos";
+import { State } from "./state";
 import { decodeTile, features, tileHasTag, tileTypes, type Tile, type TileType } from "./tile";
 import type { Icon, TilePos } from "./types";
 import { components } from "./ui";
 import { extractBounds } from "./ui/component";
 import { Component, DEFAULT_STYLE, Style } from "./ui/types";
-import { chunks, type ChunkGen } from "./world";
+import { BuildingGen, buildingGen, chunkGen, type ChunkGen } from "./world";
 
-export const highlightedTiles: TilePos[] = [];
-
-export function startRenderLoop() {
+export function startRenderLoop(state: State) {
 	function loop() {
 		interpolate();
-		render();
+		render(state);
 		requestAnimationFrame(loop);
 	}
 	loop();
@@ -34,15 +34,29 @@ let prev = performance.now();
 let fps: string;
 let tick = 0;
 
-function render() {
+function render(state: State) {
 	const [from, to] = getVisibleChunkPoses(getCanvasCameraInfo(), 2);
-	drawTiles(() => chunks(from, to));
+	drawTiles(() => chunkGen(from, to));
 
-	drawFeatures(chunks(from, to));
+	drawFeatures(chunkGen(from, to));
+
+	drawBuildings(buildingGen(from, to));
 
 	ctx.fillStyle = "#ffffff22";
-	for (const tp of highlightedTiles) {
+	for (const tp of state.highlightedTiles.info) {
 		drawHexagon(...getHexagonBounds(tp));
+	}
+	ctx.fillStyle = "#22ff2222";
+	for (const tp of state.highlightedTiles.success) {
+		drawHexagon(...getHexagonBounds(tp));
+	}
+	ctx.fillStyle = "#ff222222";
+	for (const tp of state.highlightedTiles.danger) {
+		drawHexagon(...getHexagonBounds(tp));
+	}
+
+	for (const preview of state.buildingPreviews) {
+		drawBuildingPreview(...preview);
 	}
 
 	for (const c of components.asc()) {
@@ -142,8 +156,14 @@ function determineTileColor(t: TileType): string {
 	}
 }
 
+function drawBuildings(buildingGen: BuildingGen) {
+	for (const [pos, data] of buildingGen) {
+		drawIcon(buildings[data.b].icon, ...getBuildingBounds(pos, buildings[data.b].shape));
+	}
+}
+
 function drawFeatures(chunks: ChunkGen) {
-	for (let [pos, chunk] of chunks) {
+	for (const [pos, chunk] of chunks) {
 		if (chunk === undefined) continue;
 		chunk.tiles.forEach((t, j) => {
 			const tilePos = cwc2tile(pos, i2wc(j));
@@ -198,7 +218,7 @@ function drawIcon(icon: Icon, x: number, y: number, w: number, h: number) {
 			ctx.fillStyle = "brown";
 			ctx.fillRect(x + w * 0.4, y + h * (0.6 + treeOffset), w * 0.2, h * 0.2);
 			ctx.fillStyle = "green";
-			ctx.fillRect(x + w * (0.3 + treeOffset/2), y + h * 0.2, w * (0.4 - treeOffset), h * (0.4 + treeOffset));
+			ctx.fillRect(x + w * (0.3 + treeOffset / 2), y + h * 0.2, w * (0.4 - treeOffset), h * (0.4 + treeOffset));
 			break;
 		case "stone-1":
 		case "stone-2":
@@ -247,7 +267,38 @@ function drawIcon(icon: Icon, x: number, y: number, w: number, h: number) {
 			ctx.lineTo(x + w * 0.2, y + h * 0.3);
 			ctx.fill();
 			break;
+		case "waterWheel":
+		case "waterWheel-animated":
+			ctx.fillStyle = "brown";
+			ctx.beginPath();
+			const angle = icon.endsWith("-animated") ? tick * 5 : 0;
+			const [oX, oY] = [x + w * 0.5, y + h * 0.75];
+			const wMod = 0.4,
+				hMod = 0.1;
+
+			const splits = splitCircle(6, angle);
+			ctx.moveTo(oX + w * wMod * splits[0].x, oY + h * hMod * splits[0].y);
+			splits.forEach((i) => {
+				ctx.lineTo(oX + w * wMod * i.x, oY + h * hMod * i.y);
+				ctx.lineTo(oX + w * wMod * i.x, oY + h * hMod * i.y - h * 0.2);
+				ctx.lineTo(oX, oY - h * 0.1);
+				ctx.lineTo(oX, oY);
+			});
+
+			ctx.fill();
+			break;
 	}
+}
+
+function drawBuildingPreview(building: PreviewBuildingData, pos: TilePos) {
+	ctx.filter =
+		building.preview === "allowed"
+			? "brightness(0) saturate(100%) invert(75%) sepia(62%) saturate(430%) hue-rotate(81deg) brightness(96%) contrast(85%)"
+			: "brightness(0) saturate(100%) invert(55%) sepia(54%) saturate(4822%) hue-rotate(332deg) brightness(106%) contrast(93%)";
+
+	drawIcon(buildings[building.b].icon, ...getBuildingBounds(pos, buildings[building.b].shape));
+
+	ctx.filter = "none";
 }
 
 function drawHexagon(x: number, y: number, w: number, h: number) {
@@ -268,4 +319,9 @@ function batchHexagon(x: number, y: number, w: number, h: number) {
 function getHexagonBounds(pos: TilePos): [number, number, number, number] {
 	const c = tile2canvas({ type: "crude", x: pos.x - 1, y: pos.y - 2 / 3 }, getCanvasCameraInfo());
 	return [c.x, c.y, TILE_W * camera.scale, TILE_H * camera.scale];
+}
+
+function getBuildingBounds(pos: TilePos, _shape: 1 | 3 | 7): [number, number, number, number] {
+	const c = tile2canvas({ type: "crude", x: pos.x - 1, y: pos.y - 4 / 3 }, getCanvasCameraInfo());
+	return [c.x, c.y, TILE_W * camera.scale, TILE_H * camera.scale * 1.5];
 }
