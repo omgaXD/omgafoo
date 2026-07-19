@@ -1,5 +1,5 @@
 import { perlin } from "./perlin";
-import { encodeTile, Feature, features, tileTypes, type TileTypeBase } from "./tile";
+import { encodeTile, Feature, features, tileHasTag, tileTypes, type TileTypeBase } from "./tile";
 import type { CrudeTilePos, TilePos, Vec2 } from "./types";
 
 const offsetA: Vec2 = { x: 123, y: 456 };
@@ -19,7 +19,7 @@ export function getType(pos: CrudeTilePos | TilePos): number {
 	const r = 8 * noise(pos, offsetA, 0.15);
 
 	let candidate: Feature;
-	if (m > r) candidate = "tree";
+	if (m > r && !tileHasTag(typeIndex, 'water')) candidate = "tree";
 	else candidate = "stone";
 
 	const featureIndex = features.indexOf(Math.max(m, r) > 3 ? candidate : "none");
