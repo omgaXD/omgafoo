@@ -48,17 +48,35 @@ function render(state: State) {
 
 	drawBuildings(buildingGen(from, to));
 
+	const centerX = canvasCameraInfo.canvasWidth / 2;
+	const centerY = canvasCameraInfo.canvasHeight / 2;
+
 	ctx.fillStyle = "#ffffff22";
 	for (const tp of state.highlightedTiles.info) {
-		drawHexagon(...getHexagonBounds(tp));
+		drawHexagon(
+			Math.floor((tp.x - 1 - canvasCameraInfo.cameraPos.x) * canvasCameraInfo.cameraScale * TILE_W * 0.5 + centerX),
+			Math.floor((tp.y - 2 / 3 - canvasCameraInfo.cameraPos.y) * canvasCameraInfo.cameraScale * TILE_H * 0.75 + centerY),
+			Math.ceil(TILE_W * camera.scale),
+			Math.ceil(TILE_H * camera.scale)
+		);
 	}
 	ctx.fillStyle = "#22ff2222";
 	for (const tp of state.highlightedTiles.success) {
-		drawHexagon(...getHexagonBounds(tp));
+		drawHexagon(
+			Math.floor((tp.x - 1 - canvasCameraInfo.cameraPos.x) * canvasCameraInfo.cameraScale * TILE_W * 0.5 + centerX),
+			Math.floor((tp.y - 2 / 3 - canvasCameraInfo.cameraPos.y) * canvasCameraInfo.cameraScale * TILE_H * 0.75 + centerY),
+			Math.ceil(TILE_W * camera.scale),
+			Math.ceil(TILE_H * camera.scale)
+		);
 	}
 	ctx.fillStyle = "#ff222222";
 	for (const tp of state.highlightedTiles.danger) {
-		drawHexagon(...getHexagonBounds(tp));
+		drawHexagon(
+			Math.floor((tp.x - 1 - canvasCameraInfo.cameraPos.x) * canvasCameraInfo.cameraScale * TILE_W * 0.5 + centerX),
+			Math.floor((tp.y - 2 / 3 - canvasCameraInfo.cameraPos.y) * canvasCameraInfo.cameraScale * TILE_H * 0.75 + centerY),
+			Math.ceil(TILE_W * camera.scale),
+			Math.ceil(TILE_H * camera.scale)
+		);
 	}
 
 	for (const preview of state.buildingPreviews) {
@@ -183,7 +201,13 @@ function drawFeatures(chunks: ChunkGen) {
 }
 
 function drawFeature(pos: TilePos, tile: Tile) {
-	const [x, y, w, h] = getHexagonBounds(pos);
+	const centerX = canvasCameraInfo.canvasWidth / 2;
+	const centerY = canvasCameraInfo.canvasHeight / 2;
+
+	const x = Math.floor((pos.x - 1 - canvasCameraInfo.cameraPos.x) * canvasCameraInfo.cameraScale * TILE_W * 0.5 + centerX),
+		  y = Math.floor((pos.y - 2 / 3 - canvasCameraInfo.cameraPos.y) * canvasCameraInfo.cameraScale * TILE_H * 0.75 + centerY),
+	      w = Math.ceil(TILE_W * camera.scale),
+	      h = Math.ceil(TILE_H * camera.scale);
 
 	const type = tileTypes[tile.typeIndex];
 	const feature = features[tile.featureIndex];
@@ -363,18 +387,6 @@ function batchHexagon(x: number, y: number, w: number, h: number) {
 	ctx.lineTo(Math.floor(x + w / 2), y + h);
 	ctx.lineTo(x, Math.ceil(y + (3 * h) / 4));
 	ctx.lineTo(x, Math.floor(y + h / 4));
-}
-
-function getHexagonBounds(pos: TilePos): [number, number, number, number] {
-	const centerX = canvasCameraInfo.canvasWidth / 2;
-	const centerY = canvasCameraInfo.canvasHeight / 2;
-
-	return [
-		Math.floor((pos.x - 1 - canvasCameraInfo.cameraPos.x) * canvasCameraInfo.cameraScale * TILE_W * 0.5 + centerX),
-		Math.floor((pos.y - 2 / 3 - canvasCameraInfo.cameraPos.y) * canvasCameraInfo.cameraScale * TILE_H * 0.75 + centerY),
-		Math.ceil(TILE_W * camera.scale),
-		Math.ceil(TILE_H * camera.scale)
-	];
 }
 
 function getBuildingBounds(pos: TilePos, _shape: 1 | 3 | 7): [number, number, number, number] {
