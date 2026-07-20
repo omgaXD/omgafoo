@@ -1,10 +1,10 @@
 import { buildings, PreviewBuildingData } from "./building";
 import { camera, interpolate } from "./camera";
 import { canvas, ctx } from "./canvas";
-import { TILE_W, TILE_H } from "./const";
+import { TILE_H, TILE_W } from "./const";
 import { rnd4tile, splitCircle } from "./helpers";
 import { Icon, icons } from "./icon";
-import { type CanvasCameraInfo, tile2canvas, cwc2tile, getVisibleChunkPoses, i2wc } from "./pos";
+import { cwc2tile, getVisibleChunkPoses, i2wc, tile2canvas, type CanvasCameraInfo } from "./pos";
 import { State } from "./state";
 import { decodeTile, features, tileHasTag, tileTypes, type Tile, type TileType } from "./tile";
 import type { TilePos } from "./types";
@@ -22,7 +22,7 @@ export function startRenderLoop(state: State) {
 	loop();
 }
 
-const canvasCameraInfo = {
+export const canvasCameraInfo: CanvasCameraInfo = {
 	cameraPos: camera.pos,
 	cameraScale: camera.scale,
 	canvasHeight: canvas.height,
