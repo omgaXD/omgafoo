@@ -3,10 +3,11 @@ import { camera, interpolate } from "./camera";
 import { canvas, ctx } from "./canvas";
 import { TILE_W, TILE_H } from "./const";
 import { rnd4tile, splitCircle } from "./helpers";
+import { Icon, icons } from "./icon";
 import { type CanvasCameraInfo, tile2canvas, cwc2tile, getVisibleChunkPoses, i2wc } from "./pos";
 import { State } from "./state";
 import { decodeTile, features, tileHasTag, tileTypes, type Tile, type TileType } from "./tile";
-import type { Icon, TilePos } from "./types";
+import type { TilePos } from "./types";
 import { components } from "./ui";
 import { extractBounds } from "./ui/component";
 import { Component, DEFAULT_STYLE, Style } from "./ui/types";
@@ -21,13 +22,22 @@ export function startRenderLoop(state: State) {
 	loop();
 }
 
+const canvasCameraInfo = {
+	cameraPos: camera.pos,
+	cameraScale: camera.scale,
+	canvasHeight: canvas.height,
+	canvasWidth: canvas.width,
+};
+let dirty = false;
 export function getCanvasCameraInfo(): CanvasCameraInfo {
-	return {
-		cameraPos: camera.pos,
-		cameraScale: camera.scale,
-		canvasHeight: canvas.height,
-		canvasWidth: canvas.width,
-	};
+	if (dirty) {
+		canvasCameraInfo.cameraPos = camera.pos;
+		canvasCameraInfo.cameraScale = camera.scale;
+		canvasCameraInfo.canvasHeight = canvas.height;
+		canvasCameraInfo.canvasWidth = canvas.width;
+		dirty = false;
+	}
+	return canvasCameraInfo;
 }
 
 let prev = performance.now();
@@ -35,6 +45,7 @@ let fps: string;
 let tick = 0;
 
 function render(state: State) {
+	dirty = true;
 	const [from, to] = getVisibleChunkPoses(getCanvasCameraInfo(), 2);
 	drawTiles(() => chunkGen(from, to));
 
@@ -130,12 +141,16 @@ function drawTiles(chunks: () => ChunkGen) {
 		ctx.beginPath();
 		for (const [pos, chunk] of chunks()) {
 			if (chunk === undefined) continue;
-			chunk.tiles.forEach((t, j) => {
-				if (decodeTile(t).typeIndex === i) {
-					const tilePos = cwc2tile(pos, i2wc(j));
-					batchHexagon(...getHexagonBounds(tilePos));
-				}
-			});
+			chunk.perimeters[i].forEach(arr => {
+				if (arr.length === 0) throw 'whaat.';
+				const p = tile2canvas(arr[0], getCanvasCameraInfo());
+				ctx.moveTo(Math.round(p.x), Math.round(p.y));
+				arr.forEach((p, i) => {
+					if (i === 0) return;
+					const p2 = tile2canvas(p, getCanvasCameraInfo());
+					ctx.lineTo(Math.round(p2.x), Math.round(p2.y));
+				})
+			})
 		}
 		ctx.fill();
 	});
@@ -198,76 +213,6 @@ function drawFeature(pos: TilePos, tile: Tile) {
 
 function drawIcon(icon: Icon, x: number, y: number, w: number, h: number) {
 	switch (icon) {
-		case "palm":
-			ctx.fillStyle = "brown";
-			ctx.fillRect(x + w * 0.4, y + h * 0.6, w * 0.2, h * 0.2);
-			ctx.fillStyle = "lime";
-			ctx.beginPath();
-			ctx.moveTo(x + w * 0.7, y + h * 0.3);
-			ctx.lineTo(x + w * 0.6, y + h * 0.5);
-			ctx.lineTo(x + w * 0.8, y + h * 0.6);
-			ctx.lineTo(x + w * 0.2, y + h * 0.6);
-			ctx.lineTo(x + w * 0.4, y + h * 0.5);
-			ctx.lineTo(x + w * 0.3, y + h * 0.3);
-			ctx.lineTo(x + w * 0.5, y + h * 0.4);
-			ctx.fill();
-			break;
-		case "tree-1":
-		case "tree-2":
-			const treeOffset = icon[5] === "1" ? 0 : 0.1;
-			ctx.fillStyle = "brown";
-			ctx.fillRect(x + w * 0.4, y + h * (0.6 + treeOffset), w * 0.2, h * 0.2);
-			ctx.fillStyle = "green";
-			ctx.fillRect(x + w * (0.3 + treeOffset / 2), y + h * 0.2, w * (0.4 - treeOffset), h * (0.4 + treeOffset));
-			break;
-		case "stone-1":
-		case "stone-2":
-		case "sandstone-1":
-		case "sandstone-2":
-		case "waterstone-1":
-		case "waterstone-2":
-			if (icon.startsWith("stone-")) ctx.fillStyle = "#88aaaa";
-			if (icon.startsWith("sandstone-")) ctx.fillStyle = "#aa8833";
-			if (icon.startsWith("waterstone-")) ctx.fillStyle = "#4444bb11";
-			ctx.beginPath();
-			const stoneOffset = icon[6] === "1" ? 0.1 : -0.1;
-			ctx.moveTo(x + w * (0.5 + stoneOffset), y + h * 0.3);
-			ctx.lineTo(x + w * 0.8, y + h * 0.5);
-			ctx.lineTo(x + w * 0.7, y + h * 0.8);
-			ctx.lineTo(x + w * 0.3, y + h * 0.8);
-			ctx.lineTo(x + w * 0.2, y + h * 0.5);
-			ctx.fill();
-			if (!icon.startsWith("waterstone")) {
-				ctx.fillStyle = "#ffffff22";
-				ctx.beginPath();
-				ctx.moveTo(x + w * (0.5 + stoneOffset), y + h * 0.3);
-				ctx.lineTo(x + w * 0.3, y + h * 0.8);
-				ctx.lineTo(x + w * 0.2, y + h * 0.5);
-				ctx.fill();
-			}
-			break;
-		case "x":
-			ctx.fillStyle = "black";
-			ctx.beginPath();
-			ctx.moveTo(x + w * 0.2, y + h * 0.2);
-			ctx.lineTo(x + w * 0.3, y + h * 0.2);
-			ctx.lineTo(x + w * 0.5, y + h * 0.4);
-			ctx.lineTo(x + w * 0.7, y + h * 0.2);
-			ctx.lineTo(x + w * 0.8, y + h * 0.2);
-			ctx.lineTo(x + w * 0.8, y + h * 0.3);
-			ctx.lineTo(x + w * 0.6, y + h * 0.5);
-			ctx.lineTo(x + w * 0.8, y + h * 0.7);
-			ctx.lineTo(x + w * 0.8, y + h * 0.8);
-			ctx.lineTo(x + w * 0.7, y + h * 0.8);
-			ctx.lineTo(x + w * 0.5, y + h * 0.6);
-			ctx.lineTo(x + w * 0.3, y + h * 0.8);
-			ctx.lineTo(x + w * 0.2, y + h * 0.8);
-			ctx.lineTo(x + w * 0.2, y + h * 0.7);
-			ctx.lineTo(x + w * 0.4, y + h * 0.5);
-			ctx.lineTo(x + w * 0.2, y + h * 0.3);
-			ctx.fill();
-			break;
-		case "waterWheel":
 		case "waterWheel-animated":
 			ctx.fillStyle = "brown";
 			ctx.beginPath();
@@ -287,7 +232,116 @@ function drawIcon(icon: Icon, x: number, y: number, w: number, h: number) {
 
 			ctx.fill();
 			break;
+		default:
+			ctx.drawImage(bakedIcons[icon], x, y, w, h);
 	}
+}
+
+const ICON_WIDTH = 256;
+const ICON_HEIGHT = 256;
+function bakeIcon(icon: Icon, ctx: OffscreenCanvasRenderingContext2D) {
+	const w = ICON_WIDTH,
+		h = ICON_HEIGHT;
+	switch (icon) {
+		case "palm":
+			ctx.fillStyle = "brown";
+			ctx.fillRect(w * 0.4, h * 0.6, w * 0.2, h * 0.2);
+			ctx.fillStyle = "lime";
+			ctx.beginPath();
+			ctx.moveTo(w * 0.7, h * 0.3);
+			ctx.lineTo(w * 0.6, h * 0.5);
+			ctx.lineTo(w * 0.8, h * 0.6);
+			ctx.lineTo(w * 0.2, h * 0.6);
+			ctx.lineTo(w * 0.4, h * 0.5);
+			ctx.lineTo(w * 0.3, h * 0.3);
+			ctx.lineTo(w * 0.5, h * 0.4);
+			ctx.fill();
+			break;
+		case "tree-1":
+		case "tree-2":
+			const treeOffset = icon[5] === "1" ? 0 : 0.1;
+			ctx.fillStyle = "brown";
+			ctx.fillRect(w * 0.4, h * (0.6 + treeOffset), w * 0.2, h * 0.2);
+			ctx.fillStyle = "green";
+			ctx.fillRect(w * (0.3 + treeOffset / 2), h * 0.2, w * (0.4 - treeOffset), h * (0.4 + treeOffset));
+			break;
+		case "stone-1":
+		case "stone-2":
+		case "sandstone-1":
+		case "sandstone-2":
+		case "waterstone-1":
+		case "waterstone-2":
+			if (icon.startsWith("stone-")) ctx.fillStyle = "#88aaaa";
+			if (icon.startsWith("sandstone-")) ctx.fillStyle = "#aa8833";
+			if (icon.startsWith("waterstone-")) ctx.fillStyle = "#4444bb11";
+			ctx.beginPath();
+			const stoneOffset = icon[6] === "1" ? 0.1 : -0.1;
+			ctx.moveTo(w * (0.5 + stoneOffset), h * 0.3);
+			ctx.lineTo(w * 0.8, h * 0.5);
+			ctx.lineTo(w * 0.7, h * 0.8);
+			ctx.lineTo(w * 0.3, h * 0.8);
+			ctx.lineTo(w * 0.2, h * 0.5);
+			ctx.fill();
+			if (!icon.startsWith("waterstone")) {
+				ctx.fillStyle = "#ffffff22";
+				ctx.beginPath();
+				ctx.moveTo(w * (0.5 + stoneOffset), h * 0.3);
+				ctx.lineTo(w * 0.3, h * 0.8);
+				ctx.lineTo(w * 0.2, h * 0.5);
+				ctx.fill();
+			}
+			break;
+		case "x":
+			ctx.fillStyle = "black";
+			ctx.beginPath();
+			ctx.moveTo(w * 0.2, h * 0.2);
+			ctx.lineTo(w * 0.3, h * 0.2);
+			ctx.lineTo(w * 0.5, h * 0.4);
+			ctx.lineTo(w * 0.7, h * 0.2);
+			ctx.lineTo(w * 0.8, h * 0.2);
+			ctx.lineTo(w * 0.8, h * 0.3);
+			ctx.lineTo(w * 0.6, h * 0.5);
+			ctx.lineTo(w * 0.8, h * 0.7);
+			ctx.lineTo(w * 0.8, h * 0.8);
+			ctx.lineTo(w * 0.7, h * 0.8);
+			ctx.lineTo(w * 0.5, h * 0.6);
+			ctx.lineTo(w * 0.3, h * 0.8);
+			ctx.lineTo(w * 0.2, h * 0.8);
+			ctx.lineTo(w * 0.2, h * 0.7);
+			ctx.lineTo(w * 0.4, h * 0.5);
+			ctx.lineTo(w * 0.2, h * 0.3);
+			ctx.fill();
+			break;
+		case "waterWheel":
+			ctx.fillStyle = "brown";
+			ctx.beginPath();
+			const [oX, oY] = [w * 0.5, h * 0.75];
+			const wMod = 0.4,
+				hMod = 0.1;
+
+			const splits = splitCircle(6);
+			ctx.moveTo(oX + w * wMod * splits[0].x, oY + h * hMod * splits[0].y);
+			splits.forEach((i) => {
+				ctx.lineTo(oX + w * wMod * i.x, oY + h * hMod * i.y);
+				ctx.lineTo(oX + w * wMod * i.x, oY + h * hMod * i.y - h * 0.2);
+				ctx.lineTo(oX, oY - h * 0.1);
+				ctx.lineTo(oX, oY);
+			});
+
+			ctx.fill();
+			break;
+	}
+}
+
+const bakedIcons: Record<Icon, ImageBitmap> = bakeIcons();
+function bakeIcons(): Record<Icon, ImageBitmap> {
+	return Object.fromEntries(
+		icons.map((i) => {
+			const c = new OffscreenCanvas(ICON_WIDTH, ICON_HEIGHT);
+			bakeIcon(i, c.getContext("2d")!);
+			return [i, c.transferToImageBitmap()];
+		})
+	) as Record<Icon, ImageBitmap>;
 }
 
 function drawBuildingPreview(building: PreviewBuildingData, pos: TilePos) {
@@ -308,20 +362,20 @@ function drawHexagon(x: number, y: number, w: number, h: number) {
 }
 
 function batchHexagon(x: number, y: number, w: number, h: number) {
-	ctx.moveTo(x + w / 2, y);
-	ctx.lineTo(x + w, y + h / 4);
-	ctx.lineTo(x + w, y + (3 * h) / 4);
-	ctx.lineTo(x + w / 2, y + h);
-	ctx.lineTo(x, y + (3 * h) / 4);
-	ctx.lineTo(x, y + h / 4);
+	ctx.moveTo(Math.floor(x + w / 2), y);
+	ctx.lineTo(x + w, Math.floor(y + h / 4));
+	ctx.lineTo(x + w, Math.ceil(y + (3 * h) / 4));
+	ctx.lineTo(Math.floor(x + w / 2), y + h);
+	ctx.lineTo(x, Math.ceil(y + (3 * h) / 4));
+	ctx.lineTo(x, Math.floor(y + h / 4));
 }
 
 function getHexagonBounds(pos: TilePos): [number, number, number, number] {
 	const c = tile2canvas({ type: "crude", x: pos.x - 1, y: pos.y - 2 / 3 }, getCanvasCameraInfo());
-	return [c.x, c.y, TILE_W * camera.scale, TILE_H * camera.scale];
+	return [Math.floor(c.x), Math.floor(c.y), Math.ceil(TILE_W * camera.scale), Math.ceil(TILE_H * camera.scale)];
 }
 
 function getBuildingBounds(pos: TilePos, _shape: 1 | 3 | 7): [number, number, number, number] {
 	const c = tile2canvas({ type: "crude", x: pos.x - 1, y: pos.y - 4 / 3 }, getCanvasCameraInfo());
-	return [c.x, c.y, TILE_W * camera.scale, TILE_H * camera.scale * 1.5];
+	return [Math.floor(c.x), Math.floor(c.y), Math.ceil(TILE_W * camera.scale), Math.ceil(TILE_H * camera.scale * 1.5)];
 }

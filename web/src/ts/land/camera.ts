@@ -23,7 +23,7 @@ export function zoom({ deltaY }: { deltaY: number }) {
 
 	logicCamera.scale *= -deltaY * 0.002 + 1;
 	logicCamera.scale = Math.min(10, logicCamera.scale);
-	logicCamera.scale = Math.max(0.05, logicCamera.scale);
+	logicCamera.scale = Math.max(0.02, logicCamera.scale);
 
 	if (anchor) {
 		logicCamera.pos.x = lerp(logicCamera.pos.x, anchor.x, 1 - oldScale / logicCamera.scale);

@@ -1,9 +1,19 @@
 import { BuildingData, PreviewBuildingData } from "./building";
 import { CHUNK_SIZE } from "./const";
 import { getType } from "./generation";
+import { calculatePerimeters, Perimeter } from "./perimeter";
 import { cwc2tile, $str, i2wc, tile2c, tile2wc, wc2i, xy2c, $unstr } from "./pos";
 import { encodeTile, tileTypes, type Tile } from "./tile";
-import type { Chunks, StringVec2, Chunk, ChunkPos, TilePos } from "./types";
+import type { StringVec2, ChunkPos, TilePos } from "./types";
+
+export type Chunks = Map<StringVec2, Chunk>;
+export type Chunk = {
+	pos: ChunkPos;
+	tiles: Uint8Array;
+	visible: boolean;
+	tileTypeCounts: Uint8Array;
+	perimeters: Perimeter[]
+};
 
 export const world: Chunks = new Map<StringVec2, Chunk>();
 export const placedBuildings = new Map<StringVec2, BuildingData>();
@@ -38,6 +48,7 @@ export function createChunk(pos: ChunkPos) {
 		pos,
 		tiles,
 		tileTypeCounts,
+		perimeters: calculatePerimeters(tiles, pos)
 	};
 
 	world.set($str(pos), chunk);
