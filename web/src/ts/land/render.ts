@@ -22,22 +22,18 @@ export function startRenderLoop(state: State) {
 	loop();
 }
 
-const canvasCameraInfo = {
+export const canvasCameraInfo = {
 	cameraPos: camera.pos,
 	cameraScale: camera.scale,
 	canvasHeight: canvas.height,
 	canvasWidth: canvas.width,
 };
-let dirty = false;
-export function getCanvasCameraInfo(): CanvasCameraInfo {
-	if (dirty) {
-		canvasCameraInfo.cameraPos = camera.pos;
-		canvasCameraInfo.cameraScale = camera.scale;
-		canvasCameraInfo.canvasHeight = canvas.height;
-		canvasCameraInfo.canvasWidth = canvas.width;
-		dirty = false;
-	}
-	return canvasCameraInfo;
+
+function updateCanvasCameraInfo() {
+	canvasCameraInfo.cameraPos = camera.pos;
+	canvasCameraInfo.cameraScale = camera.scale;
+	canvasCameraInfo.canvasHeight = canvas.height;
+	canvasCameraInfo.canvasWidth = canvas.width;
 }
 
 let prev = performance.now();
@@ -45,8 +41,8 @@ let fps: string;
 let tick = 0;
 
 function render(state: State) {
-	dirty = true;
-	const [from, to] = getVisibleChunkPoses(getCanvasCameraInfo(), 2);
+	updateCanvasCameraInfo();
+	const [from, to] = getVisibleChunkPoses(canvasCameraInfo, 2);
 	drawTiles(() => chunkGen(from, to));
 
 	drawFeatures(chunkGen(from, to));
@@ -139,18 +135,18 @@ function drawTiles(chunks: () => ChunkGen) {
 		if (i === mostCommon) return;
 		ctx.fillStyle = determineTileColor(tt);
 		ctx.beginPath();
-		for (const [pos, chunk] of chunks()) {
+		for (const [, chunk] of chunks()) {
 			if (chunk === undefined) continue;
-			chunk.perimeters[i].forEach(arr => {
-				if (arr.length === 0) throw 'whaat.';
-				const p = tile2canvas(arr[0], getCanvasCameraInfo());
+			chunk.perimeters[i].forEach((arr) => {
+				if (arr.length === 0) throw "whaat.";
+				const p = tile2canvas(arr[0], canvasCameraInfo);
 				ctx.moveTo(Math.round(p.x), Math.round(p.y));
 				arr.forEach((p, i) => {
 					if (i === 0) return;
-					const p2 = tile2canvas(p, getCanvasCameraInfo());
+					const p2 = tile2canvas(p, canvasCameraInfo);
 					ctx.lineTo(Math.round(p2.x), Math.round(p2.y));
-				})
-			})
+				});
+			});
 		}
 		ctx.fill();
 	});
@@ -340,7 +336,7 @@ function bakeIcons(): Record<Icon, ImageBitmap> {
 			const c = new OffscreenCanvas(ICON_WIDTH, ICON_HEIGHT);
 			bakeIcon(i, c.getContext("2d")!);
 			return [i, c.transferToImageBitmap()];
-		})
+		}),
 	) as Record<Icon, ImageBitmap>;
 }
 
@@ -371,11 +367,11 @@ function batchHexagon(x: number, y: number, w: number, h: number) {
 }
 
 function getHexagonBounds(pos: TilePos): [number, number, number, number] {
-	const c = tile2canvas({ type: "crude", x: pos.x - 1, y: pos.y - 2 / 3 }, getCanvasCameraInfo());
+	const c = tile2canvas({ type: "crude", x: pos.x - 1, y: pos.y - 2 / 3 }, canvasCameraInfo);
 	return [Math.floor(c.x), Math.floor(c.y), Math.ceil(TILE_W * camera.scale), Math.ceil(TILE_H * camera.scale)];
 }
 
 function getBuildingBounds(pos: TilePos, _shape: 1 | 3 | 7): [number, number, number, number] {
-	const c = tile2canvas({ type: "crude", x: pos.x - 1, y: pos.y - 4 / 3 }, getCanvasCameraInfo());
+	const c = tile2canvas({ type: "crude", x: pos.x - 1, y: pos.y - 4 / 3 }, canvasCameraInfo);
 	return [Math.floor(c.x), Math.floor(c.y), Math.ceil(TILE_W * camera.scale), Math.ceil(TILE_H * camera.scale * 1.5)];
 }

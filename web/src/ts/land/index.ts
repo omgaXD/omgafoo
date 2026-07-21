@@ -2,7 +2,7 @@ import { canPlaceBuilding } from "./buildingLogic";
 import { controlCamera, moveCamera, setAnchor, zoom } from "./camera";
 import { attachMouseController, Controls, controls, registerZoom, type Mouse } from "./controls";
 import { xy2c, getVisibleChunkPoses, canvas2crude, canvasCanvas2worldDiff, canvas2tile } from "./pos";
-import { getCanvasCameraInfo, startRenderLoop } from "./render";
+import { canvasCameraInfo, startRenderLoop } from "./render";
 import { State } from "./state";
 import type { CrudeTilePos, Vec2 } from "./types";
 import { addComponent } from "./ui";
@@ -32,16 +32,16 @@ let controlsLastTick: Controls = { ...controls };
 const building = initMainScreen();
 
 function logic() {
-	const mousePosThisTick = canvas2crude(mouse.pos, getCanvasCameraInfo());
+	const mousePosThisTick = canvas2crude(mouse.pos, canvasCameraInfo);
 
 	setAnchor(mousePosThisTick);
 	if (mouse.r) {
-		const diff: Vec2 = canvasCanvas2worldDiff(mouseLastTick.pos, mouse.pos, getCanvasCameraInfo());
+		const diff: Vec2 = canvasCanvas2worldDiff(mouseLastTick.pos, mouse.pos, canvasCameraInfo);
 		moveCamera(diff);
 	} else {
 		controlCamera(controls);
 		if (mouseLastTick.r) {
-			const diff: Vec2 = canvasCanvas2worldDiff(mouseLastTick.pos, mouse.pos, getCanvasCameraInfo());
+			const diff: Vec2 = canvasCanvas2worldDiff(mouseLastTick.pos, mouse.pos, canvasCameraInfo);
 			const abrupt = 10 < diff.x ** 2 + diff.y ** 2;
 			if (abrupt) {
 				moveCamera({ x: diff.x * 2, y: diff.y * 2 });
@@ -65,23 +65,20 @@ function logic() {
 	state.highlightedTiles.info.length = 0;
 	state.highlightedTiles.success.length = 0;
 
-	const pos = canvas2tile(mouse.pos, getCanvasCameraInfo());
-	
+	const pos = canvas2tile(mouse.pos, canvasCameraInfo);
+
 	if (building.selectedIndex === 1) {
-		const canPlace = canPlaceBuilding('waterWheel', pos);
+		const canPlace = canPlaceBuilding("waterWheel", pos);
 		state.buildingPreviews = [
-			[
-				{ b: "waterWheel", preview: canPlace ? "allowed" : "disallowed", rotation: 0 },
-				{ ...pos},
-			],
+			[{ b: "waterWheel", preview: canPlace ? "allowed" : "disallowed", rotation: 0 }, { ...pos }],
 		];
-		state.highlightedTiles[canPlace ? 'success' : 'danger'] = [{...pos}];
+		state.highlightedTiles[canPlace ? "success" : "danger"] = [{ ...pos }];
 	} else {
 		state.buildingPreviews.length = 0;
-		state.highlightedTiles.info = [{...pos}];
+		state.highlightedTiles.info = [{ ...pos }];
 	}
 
-	const [from, to] = getVisibleChunkPoses(getCanvasCameraInfo(), 10);
+	const [from, to] = getVisibleChunkPoses(canvasCameraInfo, 10);
 
 	for (let x = from.x; x <= to.x; x++) {
 		for (let y = from.y; y <= to.y; y++) {
