@@ -1,4 +1,4 @@
-import { CrudeTilePos, Vec2 } from "./types";
+import { CrudeTilePos, Vec2 } from "./types/core";
 
 export function lerp(a: number, b: number, lambda: number) {
 	return b * lambda + a * (1 - lambda);
@@ -35,8 +35,8 @@ export class SortedList<T> {
 export function rnd4tile(min: number, max: number, x: number, y: number, seed: number) {
 	x %= 1000;
 	y %= 1000;
-	const r = rnd(x + 1000*y + 1000000*seed);
-	return min + r % (max - min + 1);
+	const r = rnd(x + 1000 * y + 1000000 * seed);
+	return min + (r % (max - min + 1));
 }
 
 export function rnd(seed: number) {
@@ -46,13 +46,12 @@ export function rnd(seed: number) {
 	return (a * seed + c) % m;
 }
 
-export function splitCircle<T extends number>(pieces: T, offsetDeg: number = 0): (Vec2[] & {length: T}) {
-	return Array.from({length: pieces}).map((_, i) => {
-		const angle = (i + offsetDeg / 360) * Math.PI * 2/ pieces;
-		return {x: Math.cos(angle), y: Math.sin(angle)};
-	}) as (Vec2[] & {length: T})
+export function splitCircle<T extends number>(pieces: T, offsetDeg: number = 0): Vec2[] & { length: T } {
+	return Array.from({ length: pieces }).map((_, i) => {
+		const angle = ((i + offsetDeg / 360) * Math.PI * 2) / pieces;
+		return { x: Math.cos(angle), y: Math.sin(angle) };
+	}) as Vec2[] & { length: T };
 }
-
 
 export function applyBrushlikeAction(
 	mousePosThisTick: CrudeTilePos,

@@ -1,6 +1,5 @@
 import { registerHandler } from "./component";
-import { Component, CMouseEvent } from "./types";
-
+import { Component, CMouseEvent } from "../types/ui";
 
 export function clickHandler(
 	component: Component,
@@ -38,4 +37,3 @@ export function clickHandler(
 		if (state === "leftDown") state = "downInside";
 	});
 }
-

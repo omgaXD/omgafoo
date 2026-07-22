@@ -1,6 +1,6 @@
 import { SortedList } from "../helpers";
 import { eventAppliesTo } from "./mouseEvent";
-import { CMouseEvent, CMouseEventType, Component, ComponentDrawInfo } from "./types";
+import { CMouseEvent, CMouseEventType, Component, ComponentDrawInfo } from "../types/ui";
 
 export const components = new SortedList<Component>((a, b) => a.z - b.z);
 

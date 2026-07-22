@@ -1,9 +1,8 @@
 import { CHUNK_SIZE } from "./const";
 import { cwc2tile, i2wc, wc2i } from "./pos";
 import { decodeTile, tileTypes } from "./tile";
-import { ChunkPos, CrudeTilePos } from "./types";
-
-export type Perimeter = CrudeTilePos[][];
+import { ChunkPos, CrudeTilePos } from "./types/core";
+import { Perimeter } from "./world/types";
 
 export function calculatePerimeters(tiles: Uint8Array, chunkPos: ChunkPos): Perimeter[] {
 	return tileTypes.map((_, tti) => {

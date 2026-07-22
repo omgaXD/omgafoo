@@ -1,19 +1,20 @@
-import { canPlaceBuilding } from "./buildingLogic";
 import { controlCamera, moveCamera, setAnchor, zoom } from "./camera";
 import { attachMouseController, Controls, controls, registerZoom, type Mouse } from "./controls";
 import { xy2c, getVisibleChunkPoses, canvas2crude, canvasCanvas2worldDiff, canvas2tile } from "./pos";
 import { canvasCameraInfo, startRenderLoop } from "./render";
 import { State } from "./state";
-import type { CrudeTilePos, Vec2 } from "./types";
-import { addComponent } from "./ui";
+import type { CrudeTilePos, Vec2 } from "./types/core";
+import { addComponent } from "./ui/ui";
 import { initMainScreen } from "./ui/main";
 import { uiPos } from "./ui/uiPos";
-import { createChunk, hasChunk, placeBuilding } from "./world";
+import { World } from "./world/world";
 
 registerZoom(zoom);
+const world = new World();
 const state: State = {
+	previews: [],
 	highlightedTiles: { danger: [], info: [], success: [] },
-	buildingPreviews: [],
+	world,
 };
 startRenderLoop(state);
 
@@ -50,12 +51,12 @@ function logic() {
 	}
 
 	if (mouse.l) {
-		if (state.buildingPreviews) {
-			if (!state.buildingPreviews.some((bp) => !canPlaceBuilding(bp[0].b, bp[1]))) {
-				state.buildingPreviews.forEach((bp) => {
-					placeBuilding(...bp);
+		if (state.previews) {
+			if (!state.previews.some((bp) => !world.buildingService.canPlaceBuilding(bp.pos, bp.building))) {
+				state.previews.forEach((bp) => {
+					world.buildingService.setBuilding(bp.pos, bp.building);
 				});
-				state.buildingPreviews.length = 0;
+				state.previews.length = 0;
 				building.selectedIndex = 0;
 			}
 		}
@@ -68,13 +69,11 @@ function logic() {
 	const pos = canvas2tile(mouse.pos, canvasCameraInfo);
 
 	if (building.selectedIndex === 1) {
-		const canPlace = canPlaceBuilding("waterWheel", pos);
-		state.buildingPreviews = [
-			[{ b: "waterWheel", preview: canPlace ? "allowed" : "disallowed", rotation: 0 }, { ...pos }],
-		];
+		const canPlace = world.buildingService.canPlaceBuilding(pos, "waterWheel");
+		state.previews = [{ building: "waterWheel", pos, preview: canPlace ? "allowed" : "disallowed" }];
 		state.highlightedTiles[canPlace ? "success" : "danger"] = [{ ...pos }];
 	} else {
-		state.buildingPreviews.length = 0;
+		state.previews.length = 0;
 		state.highlightedTiles.info = [{ ...pos }];
 	}
 
@@ -83,7 +82,7 @@ function logic() {
 	for (let x = from.x; x <= to.x; x++) {
 		for (let y = from.y; y <= to.y; y++) {
 			if (((x + y) & 1) === (tick & 1)) continue;
-			if (!hasChunk(xy2c(x, y))) createChunk(xy2c(x, y));
+			if (!world.hasChunk(xy2c(x, y))) world.createChunk(xy2c(x, y));
 		}
 	}
 

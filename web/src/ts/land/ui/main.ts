@@ -1,10 +1,10 @@
-import { addComponent } from ".";
+import { addComponent } from "./ui";
 import { createBoundRadioGroup } from "./radio";
-import { ButtonComponent } from "./types";
+import { ButtonComponent } from "../types/ui";
 import { uiPos } from "./uiPos";
 
 export function initMainScreen() {
-    const noBuilding = addComponent<ButtonComponent>({
+	const noBuilding = addComponent<ButtonComponent>({
 		bounds: uiPos({ type: "absolute", bottom: 10, left: 10, width: 100, height: 100 }),
 		z: 1,
 		drawInfo: { type: "button", icon: "x", pressable: true, selectable: true, isPressed: false, isSelected: false },
@@ -27,5 +27,5 @@ export function initMainScreen() {
 	};
 	createBoundRadioGroup("feature", buildingIndex, [noBuilding, waterWheel]);
 
-    return buildingIndex;
+	return buildingIndex;
 }

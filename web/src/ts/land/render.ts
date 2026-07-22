@@ -1,17 +1,18 @@
-import { buildings, PreviewBuildingData } from "./building";
-import { camera, interpolate } from "./camera";
-import { canvas, ctx } from "./canvas";
+import { buildings } from "./building/building";
+import { interpolate, camera } from "./camera";
 import { TILE_W, TILE_H } from "./const";
+import { features } from "./feature";
 import { rnd4tile, splitCircle } from "./helpers";
 import { Icon, icons } from "./icon";
-import { type CanvasCameraInfo, tile2canvas, cwc2tile, getVisibleChunkPoses, i2wc } from "./pos";
-import { State } from "./state";
-import { decodeTile, features, tileHasTag, tileTypes, type Tile, type TileType } from "./tile";
-import type { TilePos } from "./types";
-import { components } from "./ui";
+import { getVisibleChunkPoses, tile2canvas, cwc2tile, i2wc } from "./pos";
+import { BuildingPreview, State } from "./state";
+import { tileTypes, TileType, decodeTile, Tile, tileHasTag } from "./tile";
+import { TilePos } from "./types/core";
+import { Component, DEFAULT_STYLE, Style } from "./types/ui";
+import { components } from "./ui/ui";
 import { extractBounds } from "./ui/component";
-import { Component, DEFAULT_STYLE, Style } from "./ui/types";
-import { BuildingGen, buildingGen, chunkGen, type ChunkGen } from "./world";
+import { ChunkGen, BuildingGen } from "./world/types";
+import { ctx } from "./canvas";
 
 export function startRenderLoop(state: State) {
 	function loop() {
@@ -43,11 +44,11 @@ let tick = 0;
 function render(state: State) {
 	updateCanvasCameraInfo();
 	const [from, to] = getVisibleChunkPoses(canvasCameraInfo, 2);
-	drawTiles(() => chunkGen(from, to));
+	drawTiles(() => state.world.chunkGen(from, to));
 
-	drawFeatures(chunkGen(from, to));
+	drawFeatures(state.world.chunkGen(from, to));
 
-	drawBuildings(buildingGen(from, to));
+	drawBuildings(state.world.buildingService.getBuildings()); // todo occuling
 
 	ctx.fillStyle = "#ffffff22";
 	for (const tp of state.highlightedTiles.info) {
@@ -62,8 +63,8 @@ function render(state: State) {
 		drawHexagon(...getHexagonBounds(tp));
 	}
 
-	for (const preview of state.buildingPreviews) {
-		drawBuildingPreview(...preview);
+	for (const preview of state.previews) {
+		drawBuildingPreview(preview, preview.pos);
 	}
 
 	for (const c of components.asc()) {
@@ -169,7 +170,7 @@ function determineTileColor(t: TileType): string {
 
 function drawBuildings(buildingGen: BuildingGen) {
 	for (const [pos, data] of buildingGen) {
-		drawIcon(buildings[data.b].icon, ...getBuildingBounds(pos, buildings[data.b].shape));
+		drawIcon(buildings[data].icon, ...getBuildingBounds(pos, 1));
 	}
 }
 
@@ -340,13 +341,13 @@ function bakeIcons(): Record<Icon, ImageBitmap> {
 	) as Record<Icon, ImageBitmap>;
 }
 
-function drawBuildingPreview(building: PreviewBuildingData, pos: TilePos) {
+function drawBuildingPreview(preview: BuildingPreview, pos: TilePos) {
 	ctx.filter =
-		building.preview === "allowed"
+		preview.preview === "allowed"
 			? "brightness(0) saturate(100%) invert(75%) sepia(62%) saturate(430%) hue-rotate(81deg) brightness(96%) contrast(85%)"
 			: "brightness(0) saturate(100%) invert(55%) sepia(54%) saturate(4822%) hue-rotate(332deg) brightness(106%) contrast(93%)";
 
-	drawIcon(buildings[building.b].icon, ...getBuildingBounds(pos, buildings[building.b].shape));
+	drawIcon(buildings[preview.building].icon, ...getBuildingBounds(pos, 1));
 
 	ctx.filter = "none";
 }

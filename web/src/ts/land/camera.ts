@@ -1,6 +1,6 @@
 import type { Controls } from "./controls";
 import { lerp } from "./helpers";
-import type { Camera, CrudeTilePos, Vec2 } from "./types";
+import type { Camera, CrudeTilePos, Vec2 } from "./types/core";
 
 let anchor: Vec2 | null = null;
 
@@ -35,10 +35,8 @@ export function interpolate() {
 	const lambda = 0.15;
 	camera.pos.x = lerp(camera.pos.x, logicCamera.pos.x, lambda);
 	camera.pos.y = lerp(camera.pos.y, logicCamera.pos.y, lambda);
-	if (camera.scale / logicCamera.scale < 1)
-		camera.scale = lerp(camera.scale, logicCamera.scale, 0.1);
-	else 
-		camera.scale = lerp(camera.scale, logicCamera.scale, 0.225);
+	if (camera.scale / logicCamera.scale < 1) camera.scale = lerp(camera.scale, logicCamera.scale, 0.1);
+	else camera.scale = lerp(camera.scale, logicCamera.scale, 0.225);
 }
 
 export function controlCamera(controls: Controls) {

@@ -1,6 +1,6 @@
-import { CanvasPos, Icon } from "../types";
-import { ComponentBounds } from "./uiPos";
-
+import { Icon } from "../icon";
+import { CanvasPos, OptionalProps } from "./core";
+import { ComponentBounds } from "../ui/uiPos";
 
 export type Style = {
 	textColor: string;
@@ -27,21 +27,18 @@ export type Component<D extends ComponentDrawInfo = ComponentDrawInfo> = {
 	handlers?: HandlersObject;
 };
 
-type OptionalProp<B extends string, U extends string, T> = {
-	yes: { [key in B]: true } & { [key in U]: T};
-	common: ({ [key in B]: true } & { [key in U]: T }) | ({ [key in B]?: false } & { [key in U]?: never });
-};
+export type Pressable = OptionalProps<"pressable", { isPressed: boolean }>;
+export type Selectable = OptionalProps<"selectable", { isSelected: boolean }>;
 
-export type Pressable = OptionalProp<"pressable", "isPressed", boolean>;
-export type Selectable = OptionalProp<"selectable", "isSelected", boolean>;
-
-export type ButtonComponent = Pressable['yes'] &
-	Selectable['yes'] & {
+export type ButtonComponent = Pressable["yes"] &
+	Selectable["yes"] & {
 		type: "button";
 		icon?: Icon;
 		text?: string;
 	};
-export type ComponentDrawInfo = ({ type: "invisible" } | { type: "container" } | ButtonComponent) & Pressable['common'] & Selectable['common'];
+export type ComponentDrawInfo = ({ type: "invisible" } | { type: "container" } | ButtonComponent) &
+	Pressable["common"] &
+	Selectable["common"];
 
 export type MouseButton = "left" | "middle" | "right";
 

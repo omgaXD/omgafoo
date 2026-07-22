@@ -1,5 +1,5 @@
 import { CHUNK_SIZE, TILE_H, TILE_W } from "./const";
-import type { TilePos, WithinChunkPos, ChunkPos, Vec2, StringVec2, CrudeTilePos, CanvasPos } from "./types";
+import type { TilePos, WithinChunkPos, ChunkPos, Vec2, StringVec2, CrudeTilePos, CanvasPos } from "./types/core";
 
 function mod(a: number, m: number) {
 	if (a < 0) return ((a % m) + m) % m;
@@ -90,8 +90,8 @@ export function canvas2crude(pos: CanvasPos, info: CanvasCameraInfo): CrudeTileP
 export function canvasCanvas2worldDiff(c1: CanvasPos, c2: CanvasPos, info: CanvasCameraInfo): Vec2 {
 	return {
 		x: (c1.x - c2.x) / (TILE_W * 0.5 * info.cameraScale),
-		y: (c1.y - c2.y) / (TILE_H * 0.75 * info.cameraScale)
-	}
+		y: (c1.y - c2.y) / (TILE_H * 0.75 * info.cameraScale),
+	};
 }
 
 export function crude2tile(pos: CrudeTilePos): TilePos {

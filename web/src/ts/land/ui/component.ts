@@ -1,18 +1,13 @@
-import { CanvasPos } from "../types";
-import { Component, CMouseEventType, CMouseEventHandler } from "./types";
+import { CanvasPos } from "../types/core";
+import { Component, CMouseEventType, CMouseEventHandler } from "../types/ui";
 
 export function extractBounds(component: Component) {
-	return typeof component.bounds === 'function' ? component.bounds() : component.bounds;
+	return typeof component.bounds === "function" ? component.bounds() : component.bounds;
 }
 
 export function posWithin(pos: CanvasPos, component: Component) {
 	const bounds = extractBounds(component);
-	return (
-		bounds.x <= pos.x &&
-		bounds.y <= pos.y &&
-		pos.x <= bounds.x + bounds.w &&
-		pos.y <= bounds.y + bounds.h
-	);
+	return bounds.x <= pos.x && bounds.y <= pos.y && pos.x <= bounds.x + bounds.w && pos.y <= bounds.y + bounds.h;
 }
 
 export function registerHandler<const T extends CMouseEventType>(
