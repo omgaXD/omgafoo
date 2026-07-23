@@ -1,6 +1,6 @@
 import { addComponent } from "./ui";
 import { createBoundRadioGroup } from "./radio";
-import { ButtonComponent } from "../types/ui";
+import { ButtonComponent } from "./types";
 import { uiPos } from "./uiPos";
 
 export function initMainScreen() {

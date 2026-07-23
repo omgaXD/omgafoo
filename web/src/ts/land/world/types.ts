@@ -1,7 +1,7 @@
 import { BuildingKind } from "../building/building";
 import { StressConnectorStrategy, StressConsumerStrategy, StressProducerStrategy } from "../building/strategy";
 import { Tile } from "../tile";
-import { ChunkPos, CrudeTilePos, TilePos } from "../types/core";
+import { ChunkPos, CrudeTilePos, TilePos } from "../coreTypes";
 
 type JSONPrimitive = string | number | boolean | null | undefined;
 export type JSONValue = JSONPrimitive | JSONValue[] | { [key: string]: JSONValue };

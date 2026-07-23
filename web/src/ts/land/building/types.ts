@@ -1,5 +1,5 @@
 import { IWorld } from "../world/types";
-import { TilePos } from "../types/core";
+import { TilePos } from "../coreTypes";
 import { Icon } from "../icon";
 
 export interface IBuildingStrategy {

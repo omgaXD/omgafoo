@@ -3,7 +3,7 @@ import { getType } from "../generation";
 import { calculatePerimeters } from "../perimeter";
 import { cwc2tile, $str, i2wc, tile2c, tile2wc, wc2i, xy2c } from "../pos";
 import { encodeTile, tileTypes, type Tile } from "../tile";
-import type { StringVec2, ChunkPos, TilePos } from "../types/core";
+import type { StringVec2, ChunkPos, TilePos } from "../coreTypes";
 import { WorldBuildingService } from "./buildingService";
 import { WorldDataService } from "./dataService";
 import { WorldStressNetworkService } from "./stressNetworkService";

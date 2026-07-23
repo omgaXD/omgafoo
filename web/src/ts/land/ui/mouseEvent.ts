@@ -1,5 +1,5 @@
 import { posWithin } from "./component";
-import { CMouseEvent, Component } from "../types/ui";
+import { CMouseEvent, Component } from "./types";
 
 export function eventAppliesTo(ev: CMouseEvent, component: Component): boolean {
 	switch (ev.type) {

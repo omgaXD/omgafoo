@@ -1,7 +1,7 @@
 import { Feature, features } from "../feature";
 import { Item } from "../item";
 import { decodeTile, tileHasTag, TileTag } from "../tile";
-import { TilePos } from "../types/core";
+import { TilePos } from "../coreTypes";
 import { IWorld } from "../world/types";
 import { propertyWithDefault } from "./buildingProperty";
 import { IBuildingStrategy } from "./types";
@@ -73,11 +73,11 @@ export class InventoryStrategy implements IBuildingStrategy {
 	getMaxForItem(world: IWorld, pos: TilePos, item: Item) {
 		const conf = this.inventoryConfig(world, pos);
 		if (conf[item] !== undefined) return conf[item].maxCount;
-		else if (conf['*'] !== undefined) return conf['*'].maxCount;
+		else if (conf["*"] !== undefined) return conf["*"].maxCount;
 		else return 0;
 	}
 	untilMax(world: IWorld, pos: TilePos, item: Item) {
-		return this.getMaxForItem(world, pos, item) - (this.inventory(world, pos)[item] ?? 0)
+		return this.getMaxForItem(world, pos, item) - (this.inventory(world, pos)[item] ?? 0);
 	}
 
 	addItem(world: IWorld, pos: TilePos, item: Item, count: number) {
@@ -89,7 +89,7 @@ export class InventoryStrategy implements IBuildingStrategy {
 		if (count < 0) throw Error();
 		if (!this.canReduceItem(world, pos, item, count)) throw Error();
 		const inv = this.inventory(world, pos);
-		this.setItem(world, pos, item, (inv[item] ?? 0) - count)
+		this.setItem(world, pos, item, (inv[item] ?? 0) - count);
 	}
 
 	tick(world: IWorld, pos: TilePos): void {

@@ -1,5 +1,5 @@
 import { CHUNK_SIZE, TILE_H, TILE_W } from "./const";
-import type { TilePos, WithinChunkPos, ChunkPos, Vec2, StringVec2, CrudeTilePos, CanvasPos } from "./types/core";
+import type { TilePos, WithinChunkPos, ChunkPos, Vec2, StringVec2, CrudeTilePos, CanvasPos } from "./coreTypes";
 
 function mod(a: number, m: number) {
 	if (a < 0) return ((a % m) + m) % m;

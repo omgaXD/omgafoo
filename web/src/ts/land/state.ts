@@ -1,5 +1,5 @@
 import { BuildingKind } from "./building/building";
-import { TilePos } from "./types/core";
+import { TilePos } from "./coreTypes";
 import { World } from "./world/world";
 
 export type BuildingPreview = {

@@ -7,8 +7,8 @@ import { Icon, icons } from "./icon";
 import { getVisibleChunkPoses, tile2canvas, cwc2tile, i2wc } from "./pos";
 import { BuildingPreview, State } from "./state";
 import { tileTypes, TileType, decodeTile, Tile, tileHasTag } from "./tile";
-import { TilePos } from "./types/core";
-import { Component, DEFAULT_STYLE, Style } from "./types/ui";
+import { TilePos } from "./coreTypes";
+import { Component, DEFAULT_STYLE, Style } from "./ui/types";
 import { components } from "./ui/ui";
 import { extractBounds } from "./ui/component";
 import { ChunkGen, BuildingGen } from "./world/types";
@@ -213,7 +213,7 @@ function drawIcon(icon: Icon, x: number, y: number, w: number, h: number) {
 		case "waterWheel-animated":
 			ctx.fillStyle = "brown";
 			ctx.beginPath();
-			const angle = tick * 5
+			const angle = tick * 5;
 			const [oX, oY] = [x + w * 0.5, y + h * 0.75];
 			const wMod = 0.4,
 				hMod = 0.1;

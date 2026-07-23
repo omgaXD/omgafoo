@@ -1,4 +1,4 @@
-import { Component, CMouseEvent } from "../types/ui";
+import { Component, CMouseEvent } from "./types";
 import { clickHandler } from "./uiLogic";
 
 type RadioGroup = {

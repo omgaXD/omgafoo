@@ -3,7 +3,7 @@ import { attachMouseController, Controls, controls, registerZoom, type Mouse } f
 import { xy2c, getVisibleChunkPoses, canvas2crude, canvasCanvas2worldDiff, canvas2tile } from "./pos";
 import { canvasCameraInfo, startRenderLoop } from "./render";
 import { State } from "./state";
-import type { CrudeTilePos, Vec2 } from "./types/core";
+import type { CrudeTilePos, Vec2 } from "./coreTypes";
 import { addComponent } from "./ui/ui";
 import { initMainScreen } from "./ui/main";
 import { uiPos } from "./ui/uiPos";

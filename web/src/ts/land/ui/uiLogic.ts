@@ -1,5 +1,5 @@
 import { registerHandler } from "./component";
-import { Component, CMouseEvent } from "../types/ui";
+import { Component, CMouseEvent } from "./types";
 
 export function clickHandler(
 	component: Component,

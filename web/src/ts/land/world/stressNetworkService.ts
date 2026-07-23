@@ -1,5 +1,5 @@
 import { StressProducerStrategy, StressConsumerStrategy, StressConnectorStrategy } from "../building/strategy";
-import { TilePos } from "../types/core";
+import { TilePos } from "../coreTypes";
 import { ISaveable, IWorld, IWorldStressNetworkService } from "./types";
 
 export class WorldStressNetworkService implements IWorldStressNetworkService, ISaveable<{ data: any }> {

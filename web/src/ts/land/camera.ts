@@ -1,6 +1,6 @@
 import type { Controls } from "./controls";
 import { lerp } from "./helpers";
-import type { Camera, CrudeTilePos, Vec2 } from "./types/core";
+import type { Camera, CrudeTilePos, Vec2 } from "./coreTypes";
 
 let anchor: Vec2 | null = null;
 

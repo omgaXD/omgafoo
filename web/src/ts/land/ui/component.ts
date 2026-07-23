@@ -1,5 +1,5 @@
-import { CanvasPos } from "../types/core";
-import { Component, CMouseEventType, CMouseEventHandler } from "../types/ui";
+import { CanvasPos } from "../coreTypes";
+import { Component, CMouseEventType, CMouseEventHandler } from "./types";
 
 export function extractBounds(component: Component) {
 	return typeof component.bounds === "function" ? component.bounds() : component.bounds;

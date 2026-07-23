@@ -1,5 +1,5 @@
 import { $str } from "../pos";
-import { StringVec2, TilePos } from "../types/core";
+import { StringVec2, TilePos } from "../coreTypes";
 import { ISaveable, IWorld, IWorldDataService, JSONValue } from "./types";
 
 export class WorldDataService implements IWorldDataService, ISaveable<[StringVec2, Record<string, JSONValue>][]> {
@@ -18,7 +18,7 @@ export class WorldDataService implements IWorldDataService, ISaveable<[StringVec
 		return this._data.get($str(pos))![key] as T | undefined;
 	}
 	setData<T extends JSONValue>(pos: TilePos, key: string, value: T): void {
-        if (!this._data.has($str(pos))) this._data.set($str(pos), {});
+		if (!this._data.has($str(pos))) this._data.set($str(pos), {});
 		this._data.get($str(pos))![key] = value;
 	}
 	data<T extends JSONValue>(pos: TilePos, key: string): { get: () => T | undefined; set: (t: T) => void } {

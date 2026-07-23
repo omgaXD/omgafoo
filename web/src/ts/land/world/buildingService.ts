@@ -1,7 +1,7 @@
 import { BuildingKind, buildings } from "../building/building";
 import { IBuildingStrategy } from "../building/types";
 import { $str, $unstr } from "../pos";
-import { StringVec2, TilePos } from "../types/core";
+import { StringVec2, TilePos } from "../coreTypes";
 import { BuildingGen, ISaveable, IWorld, IWorldBuildingService } from "./types";
 
 export class WorldBuildingService implements IWorldBuildingService, ISaveable<[StringVec2, BuildingKind][]> {

@@ -1,7 +1,7 @@
 import { Feature, features } from "./feature";
 import { perlin } from "./perlin";
 import { encodeTile, tileHasTag, tileTypes, type TileTypeBase } from "./tile";
-import type { CrudeTilePos, TilePos, Vec2 } from "./types/core";
+import type { CrudeTilePos, TilePos, Vec2 } from "./coreTypes";
 
 const offsetA: Vec2 = { x: 123, y: 456 };
 const offsetB: Vec2 = { x: 999, y: 999 };

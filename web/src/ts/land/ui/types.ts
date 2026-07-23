@@ -1,6 +1,6 @@
 import { Icon } from "../icon";
-import { CanvasPos, OptionalProps } from "./core";
-import { ComponentBounds } from "../ui/uiPos";
+import { CanvasPos, OptionalProps } from "../coreTypes";
+import { ComponentBounds } from "./uiPos";
 
 export type Style = {
 	textColor: string;

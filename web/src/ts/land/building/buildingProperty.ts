@@ -1,5 +1,5 @@
 import { IWorld, JSONValue } from "../world/types";
-import { TilePos } from "../types/core";
+import { TilePos } from "../coreTypes";
 import { IBuildingStrategy } from "./types";
 
 export function property<T extends JSONValue>(
