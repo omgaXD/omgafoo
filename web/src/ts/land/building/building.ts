@@ -1,10 +1,8 @@
-import {
-	BurnForGoods,
-	FeatureWhitelistStrategy,
-	InventoryStrategy,
-	StressProducerStrategy,
-	TileTagWhitelistStrategy,
-} from "./strategy";
+
+import { BurnForGoods } from "./strategy/burnForGoods";
+import { InventoryStrategy } from "./strategy/inventory";
+import { StressProducerStrategy } from "./strategy/stress";
+import { TileTagWhitelistStrategy, FeatureWhitelistStrategy } from "./strategy/whitelist";
 import { BuildingBase } from "./types";
 
 export const buildings = {
