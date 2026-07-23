@@ -9,7 +9,6 @@ import { BuildingBase } from "./types";
 
 export const buildings = {
 	waterWheel: {
-		icon: "waterWheel-animated",
 		strategies: [
 			new StressProducerStrategy(100),
 			new TileTagWhitelistStrategy(["water"]),
@@ -19,7 +18,6 @@ export const buildings = {
 	rockCutter: (() => {
 		const inventory = new InventoryStrategy({ stone: { accept: false, push: true, maxCount: 10 } });
 		return {
-			icon: "rockCutter-animated",
 			strategies: [
 				inventory,
 				new BurnForGoods(

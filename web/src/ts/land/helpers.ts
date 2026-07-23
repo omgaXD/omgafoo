@@ -48,7 +48,7 @@ export function rnd(seed: number) {
 
 export function splitCircle<T extends number>(pieces: T, offsetDeg: number = 0): Vec2[] & { length: T } {
 	return Array.from({ length: pieces }).map((_, i) => {
-		const angle = ((i + offsetDeg / 360) * Math.PI * 2) / pieces;
+		const angle = (i / pieces + offsetDeg / 360) * Math.PI * 2;
 		return { x: Math.cos(angle), y: Math.sin(angle) };
 	}) as Vec2[] & { length: T };
 }

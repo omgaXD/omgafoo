@@ -1,6 +1,5 @@
 import { IWorld } from "../world/types";
 import { TilePos } from "../coreTypes";
-import { Icon } from "../icon";
 
 export interface IBuildingStrategy {
 	readonly id: string;
@@ -11,6 +10,5 @@ export interface IBuildingStrategy {
 	onNeighborChange?(world: IWorld, pos: TilePos): void;
 }
 export type BuildingBase = {
-	icon: Icon;
 	strategies: IBuildingStrategy[];
 };

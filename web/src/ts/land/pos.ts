@@ -1,5 +1,5 @@
 import { CHUNK_SIZE, TILE_H, TILE_W } from "./const";
-import type { TilePos, WithinChunkPos, ChunkPos, Vec2, StringVec2, CrudeTilePos, CanvasPos } from "./coreTypes";
+import type { TilePos, WithinChunkPos, ChunkPos, Vec2, StringVec2, CrudeTilePos, CanvasPos, CanvasCameraInfo } from "./coreTypes";
 
 function mod(a: number, m: number) {
 	if (a < 0) return ((a % m) + m) % m;
@@ -66,12 +66,7 @@ export function posEquals(a: Vec2, b: Vec2) {
 	return a.x === b.x && a.y === b.y;
 }
 
-export type CanvasCameraInfo = {
-	canvasWidth: number;
-	canvasHeight: number;
-	cameraPos: CrudeTilePos;
-	cameraScale: number;
-};
+
 
 export function canvas2crude(pos: CanvasPos, info: CanvasCameraInfo): CrudeTilePos {
 	const centerX = info.canvasWidth / 2;

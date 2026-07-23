@@ -8,8 +8,16 @@ export type StringVec2 = `${number};${number}`;
 export type Camera = {
 	pos: CrudeTilePos;
 	scale: number;
+	anchor?: Vec2;
 };
 export type OptionalProps<B extends string, U extends Record<string, unknown>> = {
 	yes: { [key in B]: true } & U;
 	common: ({ [key in B]: true } & U) | ({ [key in B]?: false } & { [key in keyof U]?: never });
+};
+export type CanvasCameraInfo = {
+	canvasWidth: number;
+	canvasHeight: number;
+	cameraPos: CrudeTilePos;
+	cameraScale: number;
+	frame: number;
 };

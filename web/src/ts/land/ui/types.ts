@@ -1,4 +1,4 @@
-import { Icon } from "../icon";
+import { Icon } from "../render/icon";
 import { CanvasPos, OptionalProps } from "../coreTypes";
 import { ComponentBounds } from "./uiPos";
 
