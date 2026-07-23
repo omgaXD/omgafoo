@@ -72,6 +72,10 @@ function logic() {
 		const canPlace = world.buildingService.canPlaceBuilding(pos, "waterWheel");
 		state.previews = [{ building: "waterWheel", pos, preview: canPlace ? "allowed" : "disallowed" }];
 		state.highlightedTiles[canPlace ? "success" : "danger"] = [{ ...pos }];
+	} else if (building.selectedIndex === 2) {
+		const canPlace = world.buildingService.canPlaceBuilding(pos, "rockCutter");
+		state.previews = [{ building: "rockCutter", pos, preview: canPlace ? "allowed" : "disallowed" }];
+		state.highlightedTiles[canPlace ? "success" : "danger"] = [{ ...pos }];
 	} else {
 		state.previews.length = 0;
 		state.highlightedTiles.info = [{ ...pos }];

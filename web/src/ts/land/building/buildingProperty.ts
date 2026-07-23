@@ -19,7 +19,7 @@ export function propertyWithDefault<T extends JSONValue>(
 	strategy: IBuildingStrategy,
 	key: string,
 	defaultValue: T,
-): (world: IWorld, pos: TilePos, value?: T) => T {
+): (world: IWorld, pos: TilePos, value?: T | undefined) => T {
 	const fullKey = strategy.id + "--" + key;
 	return (world, pos, value) => {
 		if (value !== undefined) {

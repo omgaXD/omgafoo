@@ -50,23 +50,54 @@ export class StressConnectorStrategy implements IBuildingStrategy {
 }
 
 type InventoryConfig = Partial<Record<Item | "*", { maxCount: number; accept: boolean; push: boolean }>>;
+type Inventory = Partial<Record<Item, number>>;
 
 export class InventoryStrategy implements IBuildingStrategy {
 	readonly id = "inventory";
-	inventoryConfig: (world: IWorld, pos: TilePos, value: InventoryConfig | undefined) => InventoryConfig | undefined;
+	inventoryConfig: (world: IWorld, pos: TilePos, value?: InventoryConfig) => InventoryConfig;
+	inventory: (world: IWorld, pos: TilePos, value?: Inventory) => Inventory;
 	constructor(private config: InventoryConfig) {
-		this.inventoryConfig = propertyWithDefault<InventoryConfig | undefined>(this, "inventoryConfig", this.config);
+		this.inventoryConfig = propertyWithDefault(this, "inventoryConfig", this.config);
+		this.inventory = propertyWithDefault(this, "inventory", {});
 	}
 
-	hasEnoughItem(world: IWorld, pos: TilePos, item: Item, count: number) {
-		return true;
+	getItem(world: IWorld, pos: TilePos, item: Item) {
+		return this.inventory(world, pos)[item] ?? 0;
 	}
-	reduceItem(world: IWorld, pos: TilePos, item: Item, count: number) {}
+	setItem(world: IWorld, pos: TilePos, item: Item, count: number) {
+		this.inventory(world, pos)[item] = count;
+	}
+	canReduceItem(world: IWorld, pos: TilePos, item: Item, count: number) {
+		return (this.inventory(world, pos)[item] ?? 0) >= count;
+	}
+	getMaxForItem(world: IWorld, pos: TilePos, item: Item) {
+		const conf = this.inventoryConfig(world, pos);
+		if (conf[item] !== undefined) return conf[item].maxCount;
+		else if (conf['*'] !== undefined) return conf['*'].maxCount;
+		else return 0;
+	}
+	untilMax(world: IWorld, pos: TilePos, item: Item) {
+		return this.getMaxForItem(world, pos, item) - (this.inventory(world, pos)[item] ?? 0)
+	}
+
+	addItem(world: IWorld, pos: TilePos, item: Item, count: number) {
+		if (count < 0) throw Error();
+		const inv = this.inventory(world, pos);
+		this.setItem(world, pos, item, (inv[item] ?? 0) + count);
+	}
+	reduceItem(world: IWorld, pos: TilePos, item: Item, count: number) {
+		if (count < 0) throw Error();
+		if (!this.canReduceItem(world, pos, item, count)) throw Error();
+		const inv = this.inventory(world, pos);
+		this.setItem(world, pos, item, (inv[item] ?? 0) - count)
+	}
+
 	tick(world: IWorld, pos: TilePos): void {
 		// some way to exchange items by reading/writing to dataService ig
 	}
 	onRemove(world: IWorld, pos: TilePos): void {
 		this.inventoryConfig(world, pos, undefined);
+		this.inventory(world, pos, undefined);
 	}
 }
 
@@ -103,6 +134,7 @@ export class BurnForGoods implements IBuildingStrategy {
 		} else {
 			if (this.canBurn(world, pos)) {
 				this.startBurn(world, pos);
+				this.continueBurn(world, pos);
 				this.burns(world, pos, true);
 				this.burnTime(world, pos, this.burnMaxTime);
 			}
@@ -111,10 +143,10 @@ export class BurnForGoods implements IBuildingStrategy {
 }
 
 export class TileTagWhitelistStrategy implements IBuildingStrategy {
-	id='tileTagWhitelist'
-	constructor (private tags: TileTag[]) {}
+	id = "tileTagWhitelist";
+	constructor(private tags: TileTag[]) {}
 	canPlace(world: IWorld, pos: TilePos): boolean {
-		return this.tags.some(t => tileHasTag(decodeTile(world.tile(pos)!).typeIndex, t));
+		return this.tags.some((t) => tileHasTag(decodeTile(world.tile(pos)!).typeIndex, t));
 	}
 }
 export class FeatureWhitelistStrategy implements IBuildingStrategy {

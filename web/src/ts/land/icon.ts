@@ -13,6 +13,7 @@ export const icons = [
 	"waterWheel-animated",
 	"connector",
 	"rockCutter",
+	"rockCutter-animated",
 	"big-0",
 	"big-180",
 ] as const;

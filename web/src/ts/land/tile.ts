@@ -3,19 +3,19 @@ export const tileTypes = [
 		name: "grass",
 		levelA: 0,
 		levelB: 0,
-		tileTags: [],
+		tileTags: ["land"],
 	},
 	{
 		name: "grass_alt",
 		levelA: 0,
 		levelB: 1,
-		tileTags: [],
+		tileTags: ["land"],
 	},
 	{
 		name: "sand",
 		levelA: 3,
 		levelB: 0,
-		tileTags: ["desert"],
+		tileTags: ["desert", "land"],
 	},
 	{
 		name: "water",
@@ -37,7 +37,7 @@ export type TileTypeBase = {
 	levelB: number;
 	tileTags: TileTag[];
 };
-export type TileTag = "desert" | "water";
+export type TileTag = "desert" | "water" | "land";
 
 export type Tile = {
 	typeIndex: number;

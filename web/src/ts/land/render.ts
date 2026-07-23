@@ -213,7 +213,7 @@ function drawIcon(icon: Icon, x: number, y: number, w: number, h: number) {
 		case "waterWheel-animated":
 			ctx.fillStyle = "brown";
 			ctx.beginPath();
-			const angle = icon.endsWith("-animated") ? tick * 5 : 0;
+			const angle = tick * 5
 			const [oX, oY] = [x + w * 0.5, y + h * 0.75];
 			const wMod = 0.4,
 				hMod = 0.1;
@@ -229,6 +229,26 @@ function drawIcon(icon: Icon, x: number, y: number, w: number, h: number) {
 
 			ctx.fill();
 			break;
+		case "rockCutter-animated": {
+			ctx.fillStyle = "gray";
+			ctx.beginPath();
+			const angle = tick * 10;
+			const [oX, oY] = [x + w * 0.5, y + h * 0.75];
+			const wMod = 0.4,
+				hMod = 0.1;
+
+			const splits = splitCircle(8, angle);
+			ctx.moveTo(oX + w * wMod * splits[0].x, oY + h * hMod * splits[0].y);
+			splits.forEach((i) => {
+				ctx.lineTo(oX + w * wMod * i.x, oY + h * hMod * i.y);
+				ctx.lineTo(oX + w * wMod * i.x, oY + h * hMod * i.y - h * 0.2);
+				ctx.lineTo(oX, oY - h * 0.1);
+				ctx.lineTo(oX, oY);
+			});
+
+			ctx.fill();
+			break;
+		}
 		default:
 			ctx.drawImage(bakedIcons[icon], x, y, w, h);
 	}
@@ -310,22 +330,44 @@ function bakeIcon(icon: Icon, ctx: OffscreenCanvasRenderingContext2D) {
 			ctx.fill();
 			break;
 		case "waterWheel":
-			ctx.fillStyle = "brown";
-			ctx.beginPath();
-			const [oX, oY] = [w * 0.5, h * 0.75];
-			const wMod = 0.4,
-				hMod = 0.1;
+			{
+				ctx.fillStyle = "brown";
+				ctx.beginPath();
+				const [oX, oY] = [w * 0.5, h * 0.75];
+				const wMod = 0.4,
+					hMod = 0.1;
 
-			const splits = splitCircle(6);
-			ctx.moveTo(oX + w * wMod * splits[0].x, oY + h * hMod * splits[0].y);
-			splits.forEach((i) => {
-				ctx.lineTo(oX + w * wMod * i.x, oY + h * hMod * i.y);
-				ctx.lineTo(oX + w * wMod * i.x, oY + h * hMod * i.y - h * 0.2);
-				ctx.lineTo(oX, oY - h * 0.1);
-				ctx.lineTo(oX, oY);
-			});
+				const splits = splitCircle(6);
+				ctx.moveTo(oX + w * wMod * splits[0].x, oY + h * hMod * splits[0].y);
+				splits.forEach((i) => {
+					ctx.lineTo(oX + w * wMod * i.x, oY + h * hMod * i.y);
+					ctx.lineTo(oX + w * wMod * i.x, oY + h * hMod * i.y - h * 0.2);
+					ctx.lineTo(oX, oY - h * 0.1);
+					ctx.lineTo(oX, oY);
+				});
 
-			ctx.fill();
+				ctx.fill();
+			}
+			break;
+		case "rockCutter":
+			{
+				ctx.fillStyle = "gray";
+				ctx.beginPath();
+				const [oX, oY] = [w * 0.5, h * 0.75];
+				const wMod = 0.4,
+					hMod = 0.1;
+
+				const splits = splitCircle(8);
+				ctx.moveTo(oX + w * wMod * splits[0].x, oY + h * hMod * splits[0].y);
+				splits.forEach((i) => {
+					ctx.lineTo(oX + w * wMod * i.x, oY + h * hMod * i.y);
+					ctx.lineTo(oX + w * wMod * i.x, oY + h * hMod * i.y - h * 0.2);
+					ctx.lineTo(oX, oY - h * 0.1);
+					ctx.lineTo(oX, oY);
+				});
+
+				ctx.fill();
+			}
 			break;
 	}
 }
