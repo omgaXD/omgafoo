@@ -1,7 +1,7 @@
 import { BuildingKind } from "../building/building";
-import { StressConnectorStrategy, StressConsumerStrategy, StressProducerStrategy } from "../building/strategy";
 import { Tile } from "../tile";
 import { ChunkPos, CrudeTilePos, TilePos } from "../coreTypes";
+import { StressNetworkElementStrategy } from "../building/strategy/stress";
 
 type JSONPrimitive = string | number | boolean | null | undefined;
 export type JSONValue = JSONPrimitive | JSONValue[] | { [key: string]: JSONValue };
@@ -30,10 +30,14 @@ export interface IWorldDataService extends IWorldService {
 	data<T extends JSONValue>(pos: TilePos, key: string): { get: () => T | undefined; set: (t: T) => void };
 }
 
+
+export type PlacementVerdict =
+	| { verdict: true; direction: "clock" | "counterclock"; connections: TilePos[] }
+	| { verdict: false; direction: "contradiction"; clock: TilePos[]; counterclock: TilePos[] };
+
 export interface IWorldStressNetworkService extends IWorldService {
-	trackProducer(pos: TilePos, strategy: StressProducerStrategy): void;
-	trackConsumer(pos: TilePos, strategy: StressConsumerStrategy): void;
-	trackConnector(pos: TilePos, strategy: StressConnectorStrategy): void;
+	track(pos: TilePos, strategy: StressNetworkElementStrategy): void
+	canPlace(pos: TilePos, strategy: StressNetworkElementStrategy): PlacementVerdict
 	untrack(pos: TilePos): void;
 }
 

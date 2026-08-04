@@ -1,14 +1,14 @@
 
 import { BurnForGoods } from "./strategy/burnForGoods";
 import { InventoryStrategy } from "./strategy/inventory";
-import { StressProducerStrategy } from "./strategy/stress";
+import { StressNetworkElementStrategy } from "./strategy/stress";
 import { TileTagWhitelistStrategy, FeatureWhitelistStrategy } from "./strategy/whitelist";
 import { BuildingBase } from "./types";
 
 export const buildings = {
 	waterWheel: {
 		strategies: [
-			new StressProducerStrategy(100),
+			new StressNetworkElementStrategy(100),
 			new TileTagWhitelistStrategy(["water"]),
 			new FeatureWhitelistStrategy(["none"]),
 		],
@@ -18,6 +18,7 @@ export const buildings = {
 		return {
 			strategies: [
 				inventory,
+				new StressNetworkElementStrategy(-100),
 				new BurnForGoods(
 					20,
 					() => true,

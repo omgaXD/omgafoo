@@ -1,17 +1,14 @@
-import { StressProducerStrategy, StressConsumerStrategy, StressConnectorStrategy } from "../building/strategy";
-import { TilePos } from "../coreTypes";
-import { ISaveable, IWorld, IWorldStressNetworkService } from "./types";
+import { StressNetworkElementStrategy } from "../building/strategy/stress";
+import { StringVec2, TilePos } from "../coreTypes";
+import { ISaveable, IWorld, IWorldStressNetworkService, PlacementVerdict } from "./types";
 
-export class WorldStressNetworkService implements IWorldStressNetworkService, ISaveable<{ data: any }> {
+export class WorldStressNetworkService implements IWorldStressNetworkService, ISaveable<{ data: any }> {	
 	constructor(private world: IWorld) {}
-
-	trackProducer(pos: TilePos, strategy: StressProducerStrategy): void {
+	canPlace(pos: TilePos, strategy: StressNetworkElementStrategy): PlacementVerdict {
 		throw new Error("Method not implemented.");
 	}
-	trackConsumer(pos: TilePos, strategy: StressConsumerStrategy): void {
-		throw new Error("Method not implemented.");
-	}
-	trackConnector(pos: TilePos, strategy: StressConnectorStrategy): void {
+	
+	track(pos: TilePos, strategy: StressNetworkElementStrategy): void {
 		throw new Error("Method not implemented.");
 	}
 	untrack(pos: TilePos): void {
