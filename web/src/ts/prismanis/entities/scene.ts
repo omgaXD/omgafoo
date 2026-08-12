@@ -1,5 +1,5 @@
 import { Rect, Vec2 } from "../primitives";
-import { curveAdderFactory, SceneObject } from "./sceneObjects";
+import { SceneObject } from "./sceneObjects";
 
 type BaseEvent = {};
 

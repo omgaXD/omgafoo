@@ -1,5 +1,5 @@
 import { TilePos } from "../../coreTypes";
-import { IWorld, JSONValue } from "../../world/types";
+import { IWorld } from "../../world/types";
 import { IBuildingStrategy, StateGetSet } from "../types";
 import { BurnForGoods } from "./burnForGoods";
 import { InventoryStrategy } from "./inventory";

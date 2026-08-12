@@ -1,5 +1,5 @@
 import { StressNetworkElementStrategy } from "../building/strategy/stress";
-import { StringVec2, TilePos } from "../coreTypes";
+import { TilePos } from "../coreTypes";
 import { ISaveable, IWorld, IWorldStressNetworkService, PlacementVerdict } from "./types";
 
 export class WorldStressNetworkService implements IWorldStressNetworkService, ISaveable<{ data: any }> {	

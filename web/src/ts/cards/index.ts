@@ -1,4 +1,4 @@
-import { createField, doMove, getMoveDestination, highlightTileAt, parseMove, parsePosition, posToVec2, renderField } from "./game";
+import { createField, doMove, getMoveDestination, highlightTileAt, parseMove, parsePosition, renderField } from "./game";
 
 const field = createField();
 renderField(field);

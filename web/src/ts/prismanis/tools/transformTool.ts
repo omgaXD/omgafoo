@@ -3,7 +3,7 @@ import { CanvasInteractionHelper } from "../render";
 import { Scene } from "../entities/scene";
 import { AbstractTool, BaseToolOptions } from "./tool";
 import { Rect, Vec2 } from "../primitives";
-import { GLOBAL_SNAP_ANGLE_TOOL_SETTING, ToolSettingSnapAngle } from "../entities/toolSettings";
+import { GLOBAL_SNAP_ANGLE_TOOL_SETTING } from "../entities/toolSettings";
 
 export type TransformToolOptions = BaseToolOptions & {
 	hlp: CanvasInteractionHelper;
@@ -95,7 +95,6 @@ export class TransformTool extends AbstractTool {
 
 	private onMouseDown(event: MouseEvent) {
 		if (!this.isEnabled()) return;
-		const shiftKey = event.shiftKey;
 		const mousePos = this.o.hlp.getMousePosition(event);
 
 		this.initialMousePos = mousePos;
@@ -290,7 +289,7 @@ export class TransformTool extends AbstractTool {
 
 		const selectedIds: string[] = [];
 		for (const obj of this.o.scene.getObjects()) {
-			const { tl, tr, bl, br } = obj.transform.getCorners();
+			const { tl, tr, bl } = obj.transform.getCorners();
 			const inRect = doRotatedRectsOverlap(
 				tl,
 				tr,

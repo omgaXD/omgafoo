@@ -20,13 +20,8 @@ export function pointInRect(point: Vec2, rect: Rect): boolean {
 	return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
 }
 
-export function pointInRotatedRect(point: Vec2, tl: Vec2, tr: Vec2, bl: Vec2, br?: Vec2) {
+export function pointInRotatedRect(point: Vec2, tl: Vec2, tr: Vec2, bl: Vec2, _br?: Vec2) {
 	// Use barycentric coordinates to check if point is inside the rotated rectangle
-	const br_computed = br || {
-		x: bl.x + (tr.x - tl.x),
-		y: bl.y + (tr.y - tl.y),
-	};
-
 	const v0 = { x: tr.x - tl.x, y: tr.y - tl.y }; // top side (tl -> tr)
 	const v1 = { x: bl.x - tl.x, y: bl.y - tl.y }; // left side (tl -> bl)
 	const v2 = { x: point.x - tl.x, y: point.y - tl.y };

@@ -46,6 +46,7 @@ if (ctx) {
 			preservesSelection: true,
 		}),
 	);
+	//@ts-ignore might be used in future
 	const lensTool = registerTool(
 		new LensTool({
 			id: "lens",
@@ -57,6 +58,7 @@ if (ctx) {
 			addLens: lensAdderFactory(currentScene),
 		}),
 	);
+	//@ts-ignore might be used in future
 	const prismTool = registerTool(
 		new PrismTool({
 			id: "prism",

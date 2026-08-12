@@ -1,5 +1,3 @@
-import { TilePos } from "../../coreTypes";
-import { IWorld } from "../../world/types";
 import { IBuildingStrategy, StrategyProps } from "../types";
 
 export class StressNetworkElementStrategy implements IBuildingStrategy<{}> {

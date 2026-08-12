@@ -4,7 +4,6 @@ import {
 	GLOBAL_MATERIAL_TOOL_SETTING,
 	GLOBAL_SNAP_ANGLE_TOOL_SETTING,
 	ToolSettingSelect,
-	ToolSettingSnapAngle,
 } from "../entities/toolSettings";
 import { Curve, Vec2 } from "../primitives";
 import { CanvasInteractionHelper } from "../render";
@@ -100,7 +99,7 @@ export class PrismTool extends AbstractTool {
 		});
 	}
 
-	private onMouseDown(e: MouseEvent): void {
+	private onMouseDown(_e: MouseEvent): void {
 		if (!this.isEnabled()) return;
 		this.reasonableDrag = false;
 		if (this.state === "idle") {
@@ -147,7 +146,7 @@ export class PrismTool extends AbstractTool {
 		this.previewPrism();
 	}
 
-	private onMouseUp(e: MouseEvent): void {
+	private onMouseUp(_e: MouseEvent): void {
 		if (!this.isEnabled()) return;
 		if (this.state === "rect" && this.reasonableDrag) {
 			this.state = "rotate";

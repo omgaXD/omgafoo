@@ -1,4 +1,4 @@
-import { CanvasCameraInfo, TilePos } from "../coreTypes";
+import { CanvasCameraInfo } from "../coreTypes";
 import { BuildingPreview } from "../state";
 import { IWorld } from "../world/types";
 import { getBuildingBounds } from "./bounds";

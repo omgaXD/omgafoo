@@ -7,7 +7,6 @@ import { AbstractTool, BaseToolOptions } from "./tool";
 import {
 	GLOBAL_MATERIAL_TOOL_SETTING,
 	GLOBAL_SNAP_ANGLE_TOOL_SETTING,
-	ToolSettingSnapAngle,
 } from "../entities/toolSettings";
 import { Material } from "../entities/material";
 
@@ -102,7 +101,7 @@ export class LensTool extends AbstractTool {
 		}
 	}
 
-	private onMouseUp(e: MouseEvent): void {
+	private onMouseUp(_e: MouseEvent): void {
 		if (this.isEnabled() === false) return;
 		if (this.state === "rectangle" && this.reasonableDrag) {
 			this.state = "firstRadius";

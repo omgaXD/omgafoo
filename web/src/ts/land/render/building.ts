@@ -1,6 +1,6 @@
-import { Building, BuildingKind, buildings } from "../building/building";
+import { BuildingKind } from "../building/building";
 import { CanvasCameraInfo, TilePos } from "../coreTypes";
-import { BuildingGen, IWorld } from "../world/types";
+import { IWorld } from "../world/types";
 import { getBuildingBounds } from "./bounds";
 import { drawIcon } from "./drawIcon";
 import { Icon } from "./icon";

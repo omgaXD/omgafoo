@@ -3,7 +3,7 @@ import { normalizeVec2 } from "../math/geometry";
 import { Curve, Vec2 } from "../primitives";
 import { CanvasInteractionHelper } from "../render";
 import { Scene } from "../entities/scene";
-import { GLOBAL_SNAP_ANGLE_TOOL_SETTING, ToolSettingSelect, ToolSettingSnapAngle } from "../entities/toolSettings";
+import { GLOBAL_SNAP_ANGLE_TOOL_SETTING, ToolSettingSelect } from "../entities/toolSettings";
 import { AbstractTool, BaseToolOptions } from "./tool";
 import { rays } from "../math/raycasting/raycasting";
 import { LightSourceAdder } from "../entities/sceneObjects";

@@ -1,6 +1,6 @@
 import { IWorld, JSONValue } from "../world/types";
 import { CrudeTilePos, TilePos } from "../coreTypes";
-import { StrategyInstances, StrategyRegistry } from "./strategy/registry";
+import { StrategyInstances } from "./strategy/registry";
 
 export type StateGetSet<T extends JSONValue> = (value?: Partial<T>) => T;
 export type StrategyProps<T extends JSONValue = {}> = {

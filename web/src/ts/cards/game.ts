@@ -222,7 +222,7 @@ export function getMoveDestination(move: Move): Vec2 {
 	}
 }
 
-export function highlightTileAt(field: Field, pos: Position | Vec2 | null) {
+export function highlightTileAt(_field: Field, pos: Position | Vec2 | null) {
 	const vec = typeof pos === "string" ? posToVec2(pos) : pos;
 	const fieldEl = document.getElementById("field")!;
 	// Remove highlight for all other tiles

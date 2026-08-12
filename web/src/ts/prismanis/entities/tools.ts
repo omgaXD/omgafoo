@@ -55,7 +55,7 @@ export function switchToTool(tool: AbstractTool, currentScene: Scene) {
 	toolDescriptionElem.textContent = tool.displayDescription;
 	toolOptionsElem.innerHTML = "";
 
-	tool.settings.forEach((setting, i) => {
+	tool.settings.forEach((setting) => {
 		const separator = document.createElement("hr");
 		toolOptionsElem.appendChild(separator);
 

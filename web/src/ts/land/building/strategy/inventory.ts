@@ -45,7 +45,7 @@ export class InventoryStrategy implements IBuildingStrategy<State> {
 	onRemove({ state }: StrategyProps<State>): void {
 		state(undefined);
 	}
-	defaultState(props: Omit<StrategyProps<State>, "state">): State {
+	defaultState(): State {
 		return {}
 	}
 }
