@@ -1,12 +1,10 @@
 import { TilePos } from "../../coreTypes";
 import { IWorld } from "../../world/types";
-import { propertyWithDefault } from "../buildingProperty";
-import { IBuildingStrategy } from "../types";
+import { IBuildingStrategy, StrategyProps } from "../types";
 
-export class BurnForGoods implements IBuildingStrategy {
+type BurnForGoodsState = {burns: boolean, burnTime: number};
+export class BurnForGoods implements IBuildingStrategy<BurnForGoodsState> {
 	readonly id = "burnForGoods";
-	burnTime: (world: IWorld, pos: TilePos, value?: number) => number;
-	burns: (world: IWorld, pos: TilePos, value?: boolean) => boolean;
 
 	constructor(
 		private burnMaxTime: number,
@@ -15,31 +13,36 @@ export class BurnForGoods implements IBuildingStrategy {
 		private continueBurn: (world: IWorld, pos: TilePos) => void,
 		private stopBurn: (world: IWorld, pos: TilePos) => void,
 	) {
-		this.burnTime = propertyWithDefault<number>(this, "burnTime", 0);
-		this.burns = propertyWithDefault<boolean>(this, "burns", false);
 	}
 
-	tick(world: IWorld, pos: TilePos): void {
-		if (this.burns(world, pos)) {
-			const bt = this.burnTime(world, pos);
-			if (bt === 0) {
+	tick({world, pos, state}: StrategyProps<BurnForGoodsState>): void {
+		let {burns, burnTime} = state();
+		if (burns) {
+			if (burnTime === 0) {
 				if (this.canBurn(world, pos)) {
 					this.continueBurn(world, pos);
-					this.burnTime(world, pos, this.burnMaxTime);
+					burnTime = this.burnMaxTime
 				} else {
 					this.stopBurn(world, pos);
-					this.burns(world, pos, false);
+					burns = false;
 				}
 			} else {
-				this.burnTime(world, pos, bt - 1);
+				burnTime--;
 			}
 		} else {
 			if (this.canBurn(world, pos)) {
 				this.startBurn(world, pos);
 				this.continueBurn(world, pos);
-				this.burns(world, pos, true);
-				this.burnTime(world, pos, this.burnMaxTime);
+				burns = true;
+				burnTime = this.burnMaxTime
 			}
+		}
+		state({burns, burnTime});
+	}
+	defaultState(): BurnForGoodsState {
+		return {
+			burns: false,
+			burnTime: 0
 		}
 	}
 }

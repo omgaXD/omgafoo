@@ -1,35 +1,37 @@
 
 import { BurnForGoods } from "./strategy/burnForGoods";
 import { InventoryStrategy } from "./strategy/inventory";
+import { stratState } from "./strategy/registry";
 import { StressNetworkElementStrategy } from "./strategy/stress";
 import { TileTagWhitelistStrategy, FeatureWhitelistStrategy } from "./strategy/whitelist";
 import { BuildingBase } from "./types";
 
 export const buildings = {
 	waterWheel: {
-		strategies: [
-			new StressNetworkElementStrategy(100),
-			new TileTagWhitelistStrategy(["water"]),
-			new FeatureWhitelistStrategy(["none"]),
-		],
+		strategies: {
+			FeatureWhitelistStrategy: new FeatureWhitelistStrategy(['none']),
+			TileTagWhitelistStrategy: new TileTagWhitelistStrategy(["water"]),
+			StressNetworkElementStrategy: new StressNetworkElementStrategy(100)
+		}
 	},
 	rockCutter: (() => {
 		const inventory = new InventoryStrategy({ stone: { accept: false, push: true, maxCount: 10 } });
 		return {
-			strategies: [
-				inventory,
-				new StressNetworkElementStrategy(-100),
-				new BurnForGoods(
+			strategies: {
+				InventoryStrategy: inventory,
+				StressNetworkElementStrategy: new StressNetworkElementStrategy(-100),
+				BurnForGoods: new BurnForGoods(
 					20,
 					() => true,
 					() => {},
 					(world, pos) =>
-						inventory.untilMax(world, pos, "stone") > 0 && inventory.addItem(world, pos, "stone", 1),
+						inventory.untilMax(stratState("InventoryStrategy", inventory, world, pos)(), "stone") > 0 &&
+						inventory.addItem(stratState("InventoryStrategy", inventory, world, pos)(), "stone", 1),
 					() => {},
 				),
-				new FeatureWhitelistStrategy(["stone"]),
-				new TileTagWhitelistStrategy(["land"]),
-			],
+				FeatureWhitelistStrategy: new FeatureWhitelistStrategy(["stone"]),
+				TileTagWhitelistStrategy: new TileTagWhitelistStrategy(["land"]),
+			},
 		};
 	})(),
 } as const satisfies Record<string, BuildingBase>;

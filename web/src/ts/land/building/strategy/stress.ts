@@ -1,18 +1,18 @@
 import { TilePos } from "../../coreTypes";
 import { IWorld } from "../../world/types";
-import { IBuildingStrategy } from "../types";
+import { IBuildingStrategy, StrategyProps } from "../types";
 
-export class StressNetworkElementStrategy implements IBuildingStrategy {
+export class StressNetworkElementStrategy implements IBuildingStrategy<{}> {
 	readonly id = "stressNetworkElement";
-	constructor(
-		public su: number,
-	) {}
+	constructor(public su: number) {}
 
-	onPlace(world: IWorld, pos: TilePos): void {
+	onPlace({ world, pos }: StrategyProps<{}>): void {
 		world.stressNetworkService.track(pos, this);
 	}
 
-	onRemove(world: IWorld, pos: TilePos): void {
+	onRemove({ world, pos }: StrategyProps<{}>): void {
 		world.stressNetworkService.untrack(pos);
 	}
+
+	defaultState() {return{}}
 }

@@ -15,8 +15,8 @@ export class WorldBuildingService implements IWorldBuildingService, ISaveable<[S
 
 	canPlaceBuilding(pos: TilePos, building: BuildingKind): boolean {
 		if (this._buildings.has($str(pos))) return false;
-		return !buildings[building].strategies.some(
-			(strat: IBuildingStrategy) => !(strat.canPlace?.(this.world, pos) ?? true),
+		return !Object.values(buildings[building].strategies).some(
+			(strat: IBuildingStrategy) => !(strat.canPlace?.({world: this.world, pos}) ?? true),
 		);
 	}
 

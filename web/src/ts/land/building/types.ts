@@ -1,14 +1,22 @@
-import { IWorld } from "../world/types";
+import { IWorld, JSONValue } from "../world/types";
 import { CrudeTilePos, TilePos } from "../coreTypes";
+import { StrategyInstances, StrategyRegistry } from "./strategy/registry";
 
-export interface IBuildingStrategy {
-	readonly id: string;
-	tick?(world: IWorld, pos: TilePos): void;
-	canPlace?(world: IWorld, pos: TilePos): CanPlaceVerdict
-	onPlace?(world: IWorld, pos: TilePos): void;
-	onRemove?(world: IWorld, pos: TilePos): void;
-	onNeighborChange?(world: IWorld, pos: TilePos): void;
-}
+export type StateGetSet<T extends JSONValue> = (value?: Partial<T>) => T;
+export type StrategyProps<T extends JSONValue = {}> = {
+	world: IWorld;
+	pos: TilePos;
+	state: StateGetSet<T>;
+};
+
+export type IBuildingStrategy<T extends JSONValue = {}> = {
+	tick?(props: StrategyProps<T>): void;
+	canPlace?(props: Omit<StrategyProps<T>, "state">): CanPlaceVerdict<T>;
+	onPlace?(props: StrategyProps<T>): void;
+	onRemove?(props: StrategyProps<T>): void;
+	onNeighborChange?(props: StrategyProps<T>): void;
+	defaultState(props: Omit<StrategyProps<T>, "state">): T;
+};
 
 type Intent = "info" | "success" | "danger" | "connection";
 type LinePreviewInstruction = {
@@ -30,11 +38,15 @@ type RotationInstruction = {
 	direction: "clock" | "counterclock" | "contradiction";
 };
 
-export type CanPlaceVerdict = {
-	verdict: boolean;
-	preview: PreviewInstruction[]
-} | boolean;
+export type CanPlaceVerdict<T extends JSONValue> =
+	| {
+			verdict: boolean;
+			previewState?: T;
+			preview: PreviewInstruction[];
+	  }
+	| boolean;
 export type PreviewInstruction = RotationInstruction | TileHighlightInstruction | LinePreviewInstruction;
+export type DisplayedPreviewInstruction = { addedAtTick: number } & PreviewInstruction;
 export type BuildingBase = {
-	strategies: IBuildingStrategy[];
+	strategies: Partial<StrategyInstances>;
 };
