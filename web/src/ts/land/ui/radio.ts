@@ -32,13 +32,24 @@ export function createRadioGroup(name: string, g: RadioGroup) {
 }
 
 export function createBoundRadioGroup(name: string, value: { selectedIndex: number }, components: Component[]) {
+	(value as { selectedIndex: number, value: undefined }).value = undefined;
+	createBoundRadioGroupWithValues<undefined>(
+		name,
+		value as { selectedIndex: number; value: undefined },
+		components.map((c) => [c, undefined]),
+	);
+}
+
+
+export function createBoundRadioGroupWithValues<T>(name: string, value: { selectedIndex: number, value: T | null }, componentsValues: [Component, T][]) {
 	createRadioGroup(name, {
 		selectedIndex: value.selectedIndex,
-		entries: components.map((c, i) => {
+		entries: componentsValues.map(([c, v], i) => {
 			return {
 				component: c,
 				onSelected() {
 					value.selectedIndex = i;
+					value.value = v;
 				},
 			};
 		}),
@@ -52,6 +63,7 @@ export function createBoundRadioGroup(name: string, value: { selectedIndex: numb
 		},
 	});
 }
+
 
 function di(g: RadioGroup, i: number) {
 	return g.entries[i].component.drawInfo;

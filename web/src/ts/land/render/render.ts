@@ -3,15 +3,15 @@ import { CanvasCameraInfo } from "../coreTypes";
 import { getVisibleChunkPoses } from "../pos";
 import { State } from "../state";
 import { components } from "../ui/ui";
-import { getHexagonBounds } from "./bounds";
 import { drawBuildings } from "./building";
 import { drawFeatures } from "./feature";
-import { drawBuildingPreviews } from "./preview";
-import { drawHexagon } from "./primitive";
+import { DisplayedPreviewInstruction, drawPreviewInstructions } from "./previewInstruction";
+import { drawPreview } from "./preview";
 import { drawTiles } from "./tile";
 import { drawComponent, drawFps } from "./ui";
 
 export class Renderer {
+	private previewInstructions = new Map<string, DisplayedPreviewInstruction>();
 	private canvasCameraInfo;
 	constructor(
 		private state: State,
@@ -27,8 +27,28 @@ export class Renderer {
 		};
 	}
 
+	syncPreviewInstructions() {
+		const frame = this.canvasCameraInfo.frame;
+		const toRemove = new Set(this.previewInstructions.keys());
+		for (const { id, ins } of this.state.preview?.instructions ?? []) {
+			if (this.previewInstructions.has(id)) {
+				toRemove.delete(id);
+				continue;
+			}
+			this.previewInstructions.set(id, { addedAtFrame: frame, removedAtFrame: null, ...ins });
+		}
+		toRemove.forEach((k) => {
+			const obj = this.previewInstructions.get(k)! 
+			if (obj.removedAtFrame === null)
+				obj.removedAtFrame = frame;
+			else if (frame - obj.removedAtFrame! > 120) this.previewInstructions.delete(k);
+		});
+		console.log([...this.previewInstructions.entries()]);
+	}
+
 	startRenderLoop() {
 		function loop(r: Renderer) {
+			r.syncPreviewInstructions();
 			interpolate(r.state.camera, r.state.logicCamera);
 			r.render();
 			requestAnimationFrame(() => loop(r));
@@ -56,20 +76,16 @@ export class Renderer {
 
 		drawBuildings(this.state.world, this.ctx, this.canvasCameraInfo); // todo occuling
 
-		this.ctx.fillStyle = "#ffffff22";
-		for (const tp of this.state.highlightedTiles.info) {
-			drawHexagon(...getHexagonBounds(tp, this.canvasCameraInfo), this.ctx);
-		}
-		this.ctx.fillStyle = "#22ff2244";
-		for (const tp of this.state.highlightedTiles.success) {
-			drawHexagon(...getHexagonBounds(tp, this.canvasCameraInfo), this.ctx);
-		}
-		this.ctx.fillStyle = "#ff222222";
-		for (const tp of this.state.highlightedTiles.danger) {
-			drawHexagon(...getHexagonBounds(tp, this.canvasCameraInfo), this.ctx);
-		}
+		drawPreviewInstructions(this.previewInstructions.values(), this.ctx, this.canvasCameraInfo);
 
-		drawBuildingPreviews(this.state.previews, this.state.world, this.ctx, this.canvasCameraInfo);
+		if (this.state.preview !== null)
+			drawPreview(
+				this.state.preview.building,
+				this.previewInstructions.values(),
+				this.state.world,
+				this.ctx,
+				this.canvasCameraInfo,
+			);
 
 		for (const c of components.asc()) {
 			drawComponent(c, this.ctx);

@@ -1,18 +1,22 @@
 import { BuildingKind } from "./building/building";
+import { Intent, PreviewInstruction } from "./building/types";
 import { Camera, TilePos } from "./coreTypes";
-import { World } from "./world/world";
+import { IWorld, JSONValue } from "./world/types";
 
-export type BuildingPreview = {
-	pos: TilePos;
-	building: BuildingKind;
-	preview: "allowed" | "disallowed";
+export type PreviewState = {
+	building: BuildingPreview;
+	instructions: { id: string; ins: PreviewInstruction }[];
 };
-
+export type BuildingPreview = {
+	kind: BuildingKind;
+	state: JSONValue;
+	pos: TilePos;
+	intent: Intent
+};
 export type State = {
-	previews: BuildingPreview[];
-	highlightedTiles: Record<"info" | "danger" | "success", TilePos[]>;
-	world: World;
+	preview: PreviewState | null;
+	world: IWorld;
 	camera: Camera;
 	logicCamera: Camera;
-	tick: number
+	tick: number;
 };

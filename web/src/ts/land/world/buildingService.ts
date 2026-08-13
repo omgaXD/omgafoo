@@ -2,7 +2,7 @@ import { BuildingKind, buildings } from "../building/building";
 import { IBuildingStrategy } from "../building/types";
 import { $str, $unstr } from "../pos";
 import { StringVec2, TilePos } from "../coreTypes";
-import { BuildingGen, ISaveable, IWorld, IWorldBuildingService } from "./types";
+import { BuildingGen, FinalCanPlaceVerdict, ISaveable, IWorld, IWorldBuildingService } from "./types";
 
 export class WorldBuildingService implements IWorldBuildingService, ISaveable<[StringVec2, BuildingKind][]> {
 	private _buildings: Map<StringVec2, BuildingKind> = new Map();
@@ -13,11 +13,28 @@ export class WorldBuildingService implements IWorldBuildingService, ISaveable<[S
 		}
 	}
 
-	canPlaceBuilding(pos: TilePos, building: BuildingKind): boolean {
-		if (this._buildings.has($str(pos))) return false;
-		return !Object.values(buildings[building].strategies).some(
-			(strat: IBuildingStrategy) => !(strat.canPlace?.({world: this.world, pos}) ?? true),
-		);
+	canPlaceBuilding(pos: TilePos, building: BuildingKind): FinalCanPlaceVerdict {
+		return Object.entries(buildings[building].strategies).reduce((result: FinalCanPlaceVerdict, val: [string, IBuildingStrategy]) => {
+			if (result.verdict === false) return result;
+			const verdict = val[1].canPlace?.({world: this.world, pos}) ?? true;
+			if (verdict === false) {
+				return { verdict: false, preview: [], previewState: []} as FinalCanPlaceVerdict
+			} else if (verdict === true) {
+				return result;
+			} else if (verdict.verdict === false) {
+				return {
+					verdict: false,
+					preview: verdict.preview,
+					previewState: verdict.previewState
+				} as FinalCanPlaceVerdict;
+			} else {
+				return {
+					verdict: true,
+					preview: result.preview.concat(verdict.preview),
+					previewState: Object.assign(result.previewState, verdict.previewState)
+				} as FinalCanPlaceVerdict
+			}
+		}, { verdict: true, preview: [], previewState: []} as FinalCanPlaceVerdict)
 	}
 
 	getBuilding(pos: TilePos): BuildingKind | undefined {

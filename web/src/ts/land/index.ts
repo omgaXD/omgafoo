@@ -1,8 +1,8 @@
 import { controlCamera, moveCamera, setAnchor, zoom } from "./camera";
 import { attachMouseController, Controls, controls, registerZoom, type Mouse } from "./controls";
-import { xy2c, getVisibleChunkPoses, canvas2crude, canvasCanvas2worldDiff, canvas2tile } from "./pos";
+import { xy2c, getVisibleChunkPoses, canvas2crude, canvasCanvas2worldDiff, canvas2tile, posEquals } from "./pos";
 import { State } from "./state";
-import type { Camera, CrudeTilePos, Vec2 } from "./coreTypes";
+import type { Camera, CanvasCameraInfo, CrudeTilePos, TilePos, Vec2 } from "./coreTypes";
 import { addComponent } from "./ui/ui";
 import { initMainScreen } from "./ui/main";
 import { uiPos } from "./ui/uiPos";
@@ -19,16 +19,14 @@ const camera: Camera = {
 		scale: 0.5,
 	};
 
-
 registerZoom((v) => zoom(v, logicCamera));
 const world = new World();
 const state: State = {
-	previews: [],
-	highlightedTiles: { danger: [], info: [], success: [] },
+	preview: null,
 	world,
-	camera, 
+	camera,
 	logicCamera,
-	tick: 0
+	tick: 0,
 };
 const renderer = new Renderer(state, canvas, ctx);
 renderer.startRenderLoop();
@@ -65,45 +63,10 @@ function logic() {
 		}
 	}
 
-	if (mouse.l) {
-		if (state.previews) {
-			if (!state.previews.some((bp) => !world.buildingService.canPlaceBuilding(bp.pos, bp.building))) {
-				state.previews.forEach((bp) => {
-					world.buildingService.setBuilding(bp.pos, bp.building);
-				});
-				state.previews.length = 0;
-				building.selectedIndex = 0;
-			}
-		}
-	}
-
-	state.highlightedTiles.danger.length = 0;
-	state.highlightedTiles.info.length = 0;
-	state.highlightedTiles.success.length = 0;
-
 	const pos = canvas2tile(mouse.pos, info);
-
-	if (building.selectedIndex === 1) {
-		const canPlace = world.buildingService.canPlaceBuilding(pos, "waterWheel");
-		state.previews = [{ building: "waterWheel", pos, preview: canPlace ? "allowed" : "disallowed" }];
-		state.highlightedTiles[canPlace ? "success" : "danger"] = [{ ...pos }];
-	} else if (building.selectedIndex === 2) {
-		const canPlace = world.buildingService.canPlaceBuilding(pos, "rockCutter");
-		state.previews = [{ building: "rockCutter", pos, preview: canPlace ? "allowed" : "disallowed" }];
-		state.highlightedTiles[canPlace ? "success" : "danger"] = [{ ...pos }];
-	} else {
-		state.previews.length = 0;
-		state.highlightedTiles.info = [{ ...pos }];
-	}
-
-	const [from, to] = getVisibleChunkPoses(info, 10);
-
-	for (let x = from.x; x <= to.x; x++) {
-		for (let y = from.y; y <= to.y; y++) {
-			if (((x + y) & 1) === (state.tick & 1)) continue;
-			if (!world.hasChunk(xy2c(x, y))) world.createChunk(xy2c(x, y));
-		}
-	}
+	processPreviews(pos);
+	
+	processChunkGen(info);
 
 	mouseLastTick = { ...mouse, pos: { ...mouse.pos } };
 	mouseWorldPosLastTick = mousePosThisTick;
@@ -112,3 +75,45 @@ function logic() {
 }
 
 setInterval(logic, 50);
+function processChunkGen(info: CanvasCameraInfo) {
+	const [from, to] = getVisibleChunkPoses(info, 10);
+
+	for (let x = from.x; x <= to.x; x++) {
+		for (let y = from.y; y <= to.y; y++) {
+			if (((x + y) & 1) === (state.tick & 1)) continue;
+			if (!world.hasChunk(xy2c(x, y))) world.createChunk(xy2c(x, y));
+		}
+	}
+}
+
+function processPreviews(pos: TilePos) {
+	if (building.value !== null) {
+		const canPlace = world.buildingService.canPlaceBuilding(pos, building.value);
+		if (mouse.l) {
+			if (canPlace.verdict === true){
+				world.buildingService.setBuilding(pos, building.value);
+				building.selectedIndex = 0;
+				state.preview = null;
+			}
+			return;
+		}
+
+		if (canPlace.preview.length === state.preview?.instructions.length &&
+			state.preview.instructions.every(
+				({ ins }, i) => ins.type === canPlace.preview[i].type
+			) && posEquals(state.preview.building.pos, pos)) return;
+
+		state.preview = {
+			instructions: canPlace.preview.map((p) => ({ id: crypto.randomUUID(), ins: p })),
+			building: {
+				kind: building.value,
+				pos,
+				state: canPlace.previewState,
+				intent: canPlace.verdict ? "success" : "danger",
+			},
+		};
+	} else {
+		state.preview = null;
+	}
+}
+

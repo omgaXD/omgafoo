@@ -1,4 +1,4 @@
-import { IBuildingStrategy, StrategyProps } from "../types";
+import { CanPlaceVerdict, IBuildingStrategy, StatelessStrategyProps, StrategyProps } from "../types";
 
 export class StressNetworkElementStrategy implements IBuildingStrategy<{}> {
 	readonly id = "stressNetworkElement";
@@ -10,6 +10,18 @@ export class StressNetworkElementStrategy implements IBuildingStrategy<{}> {
 
 	onRemove({ world, pos }: StrategyProps<{}>): void {
 		world.stressNetworkService.untrack(pos);
+	}
+
+	canPlace(props: StatelessStrategyProps<{}>): CanPlaceVerdict<{}> {
+		return {
+			verdict: true,
+			preview: [{
+				type: 'rotation',
+				direction: 'clock',
+				intent: 'info',
+				pos: props.pos
+			}]
+		}
 	}
 
 	defaultState() {return{}}
