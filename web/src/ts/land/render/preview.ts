@@ -1,14 +1,12 @@
 import { Intent } from "../building/types";
 import { CanvasCameraInfo } from "../coreTypes";
 import { BuildingPreview } from "../state";
-import { IWorld } from "../world/types";
-import { getBuildingBounds } from "./bounds";
-import { getIconForBuidling } from "./building";
-import { drawIcon } from "./drawIcon";
+import { drawBuildingModel } from "./building";
+import { modelFactories } from "./model";
 import { DisplayedPreviewInstruction, drawPreviewInstructions } from "./previewInstruction";
 
-export function drawPreview(buildingPreview: BuildingPreview, previewInstructions: Iterable<DisplayedPreviewInstruction>, world: IWorld, ctx: CanvasRenderingContext2D, info: CanvasCameraInfo) {
-    drawBuildingPreview(buildingPreview, world, ctx, info);
+export function drawPreview(buildingPreview: BuildingPreview, previewInstructions: Iterable<DisplayedPreviewInstruction>, ctx: CanvasRenderingContext2D, info: CanvasCameraInfo) {
+    drawBuildingPreview(buildingPreview, ctx, info);
     drawPreviewInstructions(previewInstructions, ctx, info);
 }
 
@@ -21,9 +19,9 @@ function getIntentFilter(intent: Intent) {
     } satisfies Record<Intent, string>)[intent];
 }
 
-export function drawBuildingPreview(preview: BuildingPreview, world: IWorld, ctx: CanvasRenderingContext2D, info: CanvasCameraInfo) {
+export function drawBuildingPreview(preview: BuildingPreview, ctx: CanvasRenderingContext2D, info: CanvasCameraInfo) {
     ctx.filter = getIntentFilter(preview.intent);
-    drawIcon(getIconForBuidling(preview.pos, preview.kind, world), ctx, ...getBuildingBounds(preview.pos, info), info.frame);
-
+    const model = modelFactories[preview.kind](preview.state);
+    drawBuildingModel(model, preview.pos, ctx, info)
     ctx.filter = "none";
 }

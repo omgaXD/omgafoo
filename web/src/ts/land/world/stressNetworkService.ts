@@ -1,3 +1,4 @@
+import { getStratState } from "../building/strategy/strategy";
 import { StressNetworkElementStrategy } from "../building/strategy/stress";
 import { TilePos } from "../coreTypes";
 import { ISaveable, IWorld, IWorldStressNetworkService, StressCanPlaceVerdict } from "./types";
@@ -9,7 +10,7 @@ export class WorldStressNetworkService implements IWorldStressNetworkService, IS
 	}
 
 	track(pos: TilePos, strategy: StressNetworkElementStrategy): void {
-		throw new Error("Method not implemented.");
+		if (strategy.su > 0) getStratState('StressNetworkElementStrategy', strategy, this.world, pos)().active = true;
 	}
 	untrack(pos: TilePos): void {
 		throw new Error("Method not implemented.");

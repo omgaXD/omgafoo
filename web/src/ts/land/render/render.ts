@@ -43,7 +43,6 @@ export class Renderer {
 				obj.removedAtFrame = frame;
 			else if (frame - obj.removedAtFrame! > 120) this.previewInstructions.delete(k);
 		});
-		console.log([...this.previewInstructions.entries()]);
 	}
 
 	startRenderLoop() {
@@ -82,7 +81,6 @@ export class Renderer {
 			drawPreview(
 				this.state.preview.building,
 				this.previewInstructions.values(),
-				this.state.world,
 				this.ctx,
 				this.canvasCameraInfo,
 			);

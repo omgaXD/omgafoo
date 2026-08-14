@@ -9,6 +9,9 @@ import { uiPos } from "./ui/uiPos";
 import { World } from "./world/world";
 import { canvas, ctx } from "./canvas";
 import { Renderer } from "./render/render";
+import { buildings } from "./building/building";
+import { getStratState, StrategyStates } from "./building/strategy/strategy";
+import { Entries } from "./helpers";
 
 const camera: Camera = {
 		pos: { type: "crude", x: 0, y: 0 },
@@ -92,8 +95,10 @@ function processPreviews(pos: TilePos) {
 		if (mouse.l) {
 			if (canPlace.verdict === true){
 				world.buildingService.setBuilding(pos, building.value);
-				building.selectedIndex = 0;
+				const strats = buildings[building.value].strategies;
+				(Object.entries(strats) as Entries<typeof strats>).forEach(([key, s]) => {if ('onPlace' in s) s.onPlace({world, pos, state: getStratState(key, s, world, pos) as any})})
 				state.preview = null;
+				building.selectedIndex = 0;
 			}
 			return;
 		}

@@ -1,8 +1,8 @@
-import { BuildingKind } from "../building/building";
+import { BuildingKind, BuildingStates } from "../building/building";
 import { Tile } from "../tile";
 import { ChunkPos, CrudeTilePos, TilePos } from "../coreTypes";
 import { StressNetworkElementStrategy } from "../building/strategy/stress";
-import { StrategyStates } from "../building/strategy/registry";
+import { StrategyStates } from "../building/strategy/strategy";
 import { PreviewInstruction } from "../building/types";
 
 type JSONPrimitive = string | number | boolean | null | undefined;
@@ -19,17 +19,21 @@ export interface IWorldServiceFactory<T extends IWorldService> {
 	new (world: IWorld): T;
 }
 
-export type FinalCanPlaceVerdict = {
+export type FinalCanPlaceVerdict<T extends BuildingKind> = {
 	verdict: boolean;
 	previewState: Partial<StrategyStates>;
 	preview: PreviewInstruction[];
-}
+};
 
 export interface IWorldBuildingService extends IWorldService {
 	getBuildings(): BuildingGen;
 	getBuilding(pos: TilePos): BuildingKind | undefined;
 	setBuilding(pos: TilePos, building: BuildingKind): void;
-	canPlaceBuilding(pos: TilePos, building: BuildingKind): FinalCanPlaceVerdict;
+	canPlaceBuilding<T extends BuildingKind>(pos: TilePos, building: T): FinalCanPlaceVerdict<T>;
+	getBuildingState<T extends BuildingKind | undefined = undefined>(
+		pos: TilePos,
+		assumedKind?: T,
+	): (T extends BuildingKind ? BuildingStates[T] : Partial<StrategyStates>) | null;
 }
 
 export interface IWorldDataService extends IWorldService {

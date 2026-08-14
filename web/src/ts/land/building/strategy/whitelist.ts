@@ -1,6 +1,6 @@
 import { Feature, features } from "../../feature";
 import { TileTag, tileHasTag, decodeTile } from "../../tile";
-import { IBuildingStrategy, StatelessStrategyProps, StrategyProps } from "../types";
+import { IBuildingStrategy, StatelessStrategyProps } from "../types";
 
 export class TileTagWhitelistStrategy implements IBuildingStrategy {
 	id = "tileTagWhitelist";

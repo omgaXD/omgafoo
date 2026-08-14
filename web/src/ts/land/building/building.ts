@@ -1,7 +1,6 @@
-
 import { BurnForGoods } from "./strategy/burnForGoods";
 import { InventoryStrategy } from "./strategy/inventory";
-import { stratState } from "./strategy/registry";
+import { StrategyStates, getStratState } from "./strategy/strategy";
 import { StressNetworkElementStrategy } from "./strategy/stress";
 import { TileTagWhitelistStrategy, FeatureWhitelistStrategy } from "./strategy/whitelist";
 import { BuildingBase } from "./types";
@@ -9,10 +8,10 @@ import { BuildingBase } from "./types";
 export const buildings = {
 	waterWheel: {
 		strategies: {
-			FeatureWhitelistStrategy: new FeatureWhitelistStrategy(['none']),
+			FeatureWhitelistStrategy: new FeatureWhitelistStrategy(["none"]),
 			TileTagWhitelistStrategy: new TileTagWhitelistStrategy(["water"]),
-			StressNetworkElementStrategy: new StressNetworkElementStrategy(100)
-		}
+			StressNetworkElementStrategy: new StressNetworkElementStrategy(100),
+		},
 	},
 	rockCutter: (() => {
 		const inventory = new InventoryStrategy({ stone: { accept: false, push: true, maxCount: 10 } });
@@ -25,8 +24,8 @@ export const buildings = {
 					() => true,
 					() => {},
 					(world, pos) =>
-						inventory.untilMax(stratState("InventoryStrategy", inventory, world, pos)(), "stone") > 0 &&
-						inventory.addItem(stratState("InventoryStrategy", inventory, world, pos)(), "stone", 1),
+						inventory.untilMax(getStratState("InventoryStrategy", inventory, world, pos)(), "stone") > 0 &&
+						inventory.addItem(getStratState("InventoryStrategy", inventory, world, pos)(), "stone", 1),
 					() => {},
 				),
 				FeatureWhitelistStrategy: new FeatureWhitelistStrategy(["stone"]),
@@ -38,3 +37,8 @@ export const buildings = {
 
 export type BuildingKind = keyof typeof buildings;
 export type Building = (typeof buildings)[BuildingKind];
+export type BuildingStates = {
+	[B in BuildingKind]: {
+		[K in keyof (typeof buildings)[B]["strategies"]]: K extends keyof StrategyStates ? StrategyStates[K] : never;
+	};
+};
