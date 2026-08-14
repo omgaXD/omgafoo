@@ -73,12 +73,11 @@ export function hideSettings() {
 
 export async function initSettings(): Promise<GameParams> {
 	initInputValidation();
-	const promise = new Promise<GameParams>((resolve) => {
+	return new Promise<GameParams>((resolve) => {
 		document.getElementById("start-button")!.addEventListener("click", () => {
 			const mode = getGameMode();
 			const flavor = getFlavor();
 			resolve(buildParams(mode, flavor));
 		});
 	});
-	return promise;
 }

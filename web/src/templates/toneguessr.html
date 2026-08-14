@@ -22,14 +22,8 @@
 					<div>
 						<div class="flex flex-col">
 							<label>
-								A =
-								<select id="notes-a-hz">
-									<option value="415">415</option>
-									<option value="432">432</option>
-									<option value="440" selected>440</option>
-									<option value="444">444</option>
-									<option value="460">460</option>
-								</select>
+								A4 =
+								<input type="number" value="440" class="w-20" id="notes-a-hz" />
 								Hz
 							</label>
 							<label id="notes-octaves">
@@ -63,9 +57,33 @@
 					<span id="game-freq-last-score" class="font-bold">???</span>
 				</p>
 			</div>
-			<label><input type="number" id="game-freq-guess" class="w-32 text-center padded text-2xl" required /> Hz</label>
+			<label
+				><input type="number" id="game-freq-guess" class="w-32 text-center padded text-2xl" required />
+				Hz</label
+			>
 			<div>
 				<button id="game-freq-submit" class="btn primary rect padded w-full">Submit</button>
+				<p class="hint-text">(Enter to submit)</p>
+			</div>
+		</div>
+		<div id="game-notes" class="hidden rect round px-4 py-4 flex-col items-center text-center gap-4">
+			<div>
+				<p class="text-3xl"><span id="game-notes-actual">???</span></p>
+				<p class="success-text">
+					You scored
+					<span id="game-notes-last-score" class="font-bold">???</span>
+				</p>
+			</div>
+			<label
+				><input
+					type="text"
+					id="game-notes-guess"
+					placeholder="A1"
+					class="w-32 text-center padded text-2xl"
+					required
+			/></label>
+			<div>
+				<button id="game-notes-submit" class="btn primary rect padded w-full">Submit</button>
 				<p class="hint-text">(Enter to submit)</p>
 			</div>
 		</div>
