@@ -25,28 +25,28 @@ main();
 
 function visualize<M, T extends number>({ modelDef, repr, mapper }: ModelController<M, T>): () => void {
 	const visualization = document.getElementById("visualization")!;
-
-	function rerender(model: M) {
-		// re-render visualization
-		const visSnapshot = snapshotFLIP(visualization);
-		console.log(visSnapshot);
-		visualization.innerHTML = "";
-		visualization.appendChild(repr.represent(model, markFlip));
-		if (visSnapshot.length > 0) applyFLIP(visualization, visSnapshot);
-	}
-
-	rerender(modelDef.baseModel());
+	
 	const seqEl = document.getElementById("sequence")! as HTMLTextAreaElement;
-	const listener = () => {
+	function rerender() {
+		// re-parse transformation
 		const result = parseTransformation(mapper, seqEl.value);
 		if (result.success) {
-			rerender(modelDef.applyTransformation(modelDef.baseModel(), result.transformation));
+			// re-render visualization
+			const visSnapshot = snapshotFLIP(visualization);
+			console.log(visSnapshot);
+			visualization.innerHTML = "";
+			visualization.appendChild(
+				repr.represent(modelDef.applyTransformation(modelDef.baseModel(), result.transformation), markFlip),
+			);
+			if (visSnapshot.length > 0) applyFLIP(visualization, visSnapshot);
 		} else {
 			console.error(result.errors.map((e) => e[1]).join("\n"));
 		}
-	};
-	seqEl.addEventListener("input", listener);
-	return () => seqEl.removeEventListener("input", listener);
+	}
+	rerender();
+
+	seqEl.addEventListener("input", rerender);
+	return () => seqEl.removeEventListener("input", rerender);
 }
 
 function play(key: keyof typeof controllers) {
