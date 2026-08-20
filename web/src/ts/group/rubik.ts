@@ -1,6 +1,6 @@
 import { drawEmptySquare, drawGrid, drawSquare, getColorFromIndex, ModelRepr } from "./dom";
 import { ModelDefinition } from "./modelDefinition";
-import { TransformationMapper } from "./parse";
+import { FiniteTransformationMapper } from "./parse";
 
 type Side<N extends 2 | 3> = FixedArray<N, FixedArray<N, number>>;
 type Model<N extends 2 | 3> = [Side<N>, Side<N>, Side<N>, Side<N>, Side<N>, Side<N>];
@@ -17,46 +17,6 @@ export class RubikModelDefinition<N extends 2 | 3> implements ModelDefinition<Mo
 		const copy = JSON.parse(JSON.stringify(model)) as number[][][];
 		for (const t of transformation) {
 			this.rotateFace(copy, t);
-			continue;
-			switch (t) {
-				case 0: {
-					// R
-					this.rotateFace(copy, 0);
-					break;
-				}
-				case 1: {
-					// L
-					for (let i = 0; i < this.size; i++) {
-						const temp = copy[0][i][0];
-						copy[0][i][0] = copy[4][i][0];
-						copy[4][i][0] = copy[2][this.size - i - 1][this.size - 1];
-						copy[2][this.size - i - 1][this.size - 1] = copy[5][i][0];
-						copy[5][i][0] = temp;
-					}
-					this.rotateFace(copy, 3);
-					break;
-				}
-				case 2: {
-					// U
-					this.rotateFace(copy, 4);
-					break;
-				}
-				case 3: {
-					// D
-					this.rotateFace(copy, 5);
-					break;
-				}
-				case 4: {
-					// F
-					this.rotateFace(copy, 0);
-					break;
-				}
-				case 5: {
-					// B
-					this.rotateFace(copy, 2);
-					break;
-				}
-			}
 		}
 		return copy as Model<N>;
 	}
@@ -123,8 +83,9 @@ export class RubikModelDefinition<N extends 2 | 3> implements ModelDefinition<Mo
 			inPlace[which][i][this.size - 1] = temp;
 		}
 	}
-	equals(model1: Model<N>, model2: Model<N>): boolean {
-		throw new Error("Method not implemented.");
+	equals(model1: number[][][], model2: number[][][]): boolean {
+		const flat1 = model1.flat(3);
+		return model2.flat(3).every((e, i) => flat1[i] === e);
 	}
 }
 
@@ -185,15 +146,11 @@ export class RubikRepr<N extends 2 | 3> implements ModelRepr<Model<N>> {
 	}
 }
 
-export class RubikMapper implements TransformationMapper<6> {
-	private map = ["r", "l", "u", "d", "f", "b"] as const;
-	parseTransformationElement(_limit: 6, string: string): FixedNumber<6> | "none" | "error" {
-		if (string === "" || string === " ") return "none";
-		const index = this.map.findIndex((el) => el === string);
-		if (index === -1) return "error";
-		return index as FixedNumber<6>;
+export class RubikMapper implements FiniteTransformationMapper<6> {
+	tokenSeparator(): " " | "" | "," {
+		return "";
 	}
-	mapToStr(t: FixedNumber<6>): string {
-		return this.map[t];
+	getValidTokens(): FixedArray<6, string> {
+		return ["r", "l", "u", "d", "f", "b"];
 	}
 }

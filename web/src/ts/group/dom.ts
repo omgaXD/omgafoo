@@ -1,3 +1,5 @@
+import { FiniteTransformationMapper } from "./parse";
+
 export interface ModelRepr<M> {
 	represent(model: M, identifyMovableNode: (el: HTMLElement, uniqueId: number | string) => void): HTMLElement;
 }
@@ -103,4 +105,29 @@ export function drawRadioGroup<T>(
 	}
 
 	return elements;
+}
+
+export function drawMapper<T extends number>(mapper: FiniteTransformationMapper<T> | null): HTMLElement {
+	const element = document.createElement("div");
+	if (mapper === null) return element;
+	element.innerHTML = /*html*/ `
+		Separator: "${mapper.tokenSeparator()}"<br />
+		Valid tokens: <p class="valid-tokens"></p>
+	`;
+	element.querySelector(".valid-tokens")!.append(
+		...(mapper.getValidTokens() as string[]).map((t, i) => {
+			const b = document.createElement("b");
+			b.textContent = t;
+			b.classList.add("text-4xl", "mr-2");
+			b.style.textShadow = `
+					-1px -1px #fff2,
+					1px -1px #fff2,
+					-1px 1px #fff2,
+					1px 1px #fff2
+				`;
+			b.style.color = getColorFromIndex(i).bg;
+			return b;
+		}),
+	);
+	return element;
 }

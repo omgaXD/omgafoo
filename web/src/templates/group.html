@@ -1,17 +1,21 @@
 {{ define "head" }} {{ end }} {{ define "content" }}
 <div class="w-full p-4">
-	<div class="grid md:grid-cols-[2fr_1fr_1fr] gap-4 min-h-8">
+	<div class="grid md:grid-cols-[1.5fr_1fr_1fr] gap-4 min-h-8">
 		<div class="rect padded round">
-			<h2>Visualization</h2>
+			<h3>Visualization</h3>
 			<div id="visualization"></div>
 		</div>
 		<div class="rect padded round flex flex-col">
-			<h2>Sequence</h2>
+			<h3>Sequence</h3>
 			<textarea id="sequence" class="w-full font-mono text-2xl h-full"></textarea>
 		</div>
 		<div class="rect padded round">
-			<h2>Groups</h2>
-			<div id="groups" class="flex flex-col gap-1 pb-2">
+			<h3>Groups</h3>
+			<div id="groups" class="flex flex-col gap-1 pb-2"></div>
+			<div id="selected-group-container" class="hidden">
+				<hr />
+				<h3>Selected group</h3>
+				<div id="selected-group"></div>
 			</div>
 		</div>
 	</div>

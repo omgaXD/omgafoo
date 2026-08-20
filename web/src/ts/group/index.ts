@@ -1,5 +1,5 @@
 import { controllers, ModelController } from "./controller";
-import { drawRadioGroup } from "./dom";
+import { drawMapper, drawRadioGroup } from "./dom";
 import { applyFLIP, markFlip, snapshotFLIP } from "./flip";
 import { parseTransformation } from "./parse";
 
@@ -13,14 +13,17 @@ function main() {
 				name: v.name,
 				value: k as keyof typeof controllers,
 			})),
-			(v) => {cleanup?.(); cleanup = play(v)},
+			(v) => {
+				cleanup?.();
+				cleanup = play(v);
+			},
 		),
 	);
 }
 
 main();
 
-function visualize<M, T extends number>({ modelDef, repr, mapper, limit }: ModelController<M, T>): () => void {
+function visualize<M, T extends number>({ modelDef, repr, mapper }: ModelController<M, T>): () => void {
 	const visualization = document.getElementById("visualization")!;
 
 	function rerender(model: M) {
@@ -35,7 +38,7 @@ function visualize<M, T extends number>({ modelDef, repr, mapper, limit }: Model
 	rerender(modelDef.baseModel());
 	const seqEl = document.getElementById("sequence")! as HTMLTextAreaElement;
 	const listener = () => {
-		const result = parseTransformation(limit, mapper, seqEl.value);
+		const result = parseTransformation(mapper, seqEl.value);
 		if (result.success) {
 			rerender(modelDef.applyTransformation(modelDef.baseModel(), result.transformation));
 		} else {
@@ -49,12 +52,20 @@ function visualize<M, T extends number>({ modelDef, repr, mapper, limit }: Model
 function play(key: keyof typeof controllers) {
 	switch (key) {
 		case "simple":
-			return visualize(controllers[key]);
+			return playConcrete(controllers[key]);
 
 		case "rubik2":
-			return visualize(controllers[key]);
+			return playConcrete(controllers[key]);
 
 		case "rubik3":
-			return visualize(controllers[key]);
+			return playConcrete(controllers[key]);
 	}
+}
+
+function playConcrete<M, T extends number>(controller: ModelController<M, T>) {
+	document.getElementById('selected-group-container')!.classList.remove('hidden');
+	const selGroup = document.getElementById('selected-group')!;
+	selGroup.innerHTML = '';
+	selGroup.appendChild(drawMapper<T>(controller.mapper));
+	return visualize(controller);
 }

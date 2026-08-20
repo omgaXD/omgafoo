@@ -1,15 +1,14 @@
 import { ModelRepr } from "./dom";
 import { ModelDefinition } from "./modelDefinition";
-import { TransformationMapper } from "./parse";
+import { FiniteTransformationMapper } from "./parse";
 import { RubikModelDefinition, RubikRepr, RubikMapper } from "./rubik";
 import { SimpleModelDefinition, SimpleModelRepr, SimpleRLUDMapper } from "./simple";
 
 export type ModelController<M, T extends number> = {
 	name: string;
-	limit: T;
 	modelDef: ModelDefinition<M, T>;
 	repr: ModelRepr<M>;
-	mapper: TransformationMapper<T>;
+	mapper: FiniteTransformationMapper<T>;
 };
 
 function buildController<M, T extends number>(
@@ -17,7 +16,7 @@ function buildController<M, T extends number>(
 	limit: T,
 	modelDef: ModelDefinition<M, T>,
 	repr: ModelRepr<M>,
-	mapper: TransformationMapper<T>,
+	mapper: FiniteTransformationMapper<T>,
 ) {
 	return {
 		name,
