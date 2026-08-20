@@ -20,7 +20,7 @@ function main() {
 
 main();
 
-function visualize<M, T extends number>({ name, modelDef, repr, mapper, limit }: ModelController<M, T>): () => void {
+function visualize<M, T extends number>({ modelDef, repr, mapper, limit }: ModelController<M, T>): () => void {
 	const visualization = document.getElementById("visualization")!;
 
 	function rerender(model: M) {
