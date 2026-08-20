@@ -89,7 +89,7 @@ export function drawRadioGroup<T>(
 	const elements: HTMLElement[] = [];
 	const memory = localStorage.getItem(`radioGroup-${groupName}-memory`);
 
-	options.forEach(({value, name}, i) => {
+	options.forEach(({ value, name }, i) => {
 		const label = document.createElement("label");
 		label.textContent = name;
 		label.classList.add("rect", "hover-highlight", "checked-highlight", "padded", "w-full");
@@ -107,34 +107,35 @@ export function drawRadioGroup<T>(
 			}
 		});
 
-		if (memory !== null && parseInt(memory) === i) {input.checked = true; choice(value); }
+		if (memory !== null && parseInt(memory) === i) {
+			input.checked = true;
+			choice(value);
+		}
 
 		elements.push(label);
 	});
 
-	
 	return elements;
 }
 
 export function drawMapper<T extends number>(mapper: FiniteTransformationMapper<T> | null): HTMLElement {
 	const element = document.createElement("div");
 	if (mapper === null) return element;
+	const separator = mapper.tokenSeparator();
+	const separatorStr = separator === "" ? "None" : `"${separator}"`;
 	element.innerHTML = /*html*/ `
-		Separator: "${mapper.tokenSeparator()}"<br />
-		Valid tokens: <p class="valid-tokens"></p>
+		Separator: ${separatorStr}<br />
+		Valid tokens: <p class="valid-tokens mt-1"></p>
 	`;
 	element.querySelector(".valid-tokens")!.append(
 		...(mapper.getValidTokens() as string[]).map((t, i) => {
-			const b = document.createElement("b");
+			const b = document.createElement("tt");
 			b.textContent = t;
-			b.classList.add("text-4xl", "mr-2");
-			b.style.textShadow = `
-					-1px -1px #fff2,
-					1px -1px #fff2,
-					-1px 1px #fff2,
-					1px 1px #fff2
-				`;
-			b.style.color = getColorFromIndex(i).bg;
+			b.classList.add("text-4xl", "mr-2", "p-0.5");
+			const color = getColorFromIndex(i);
+			b.style.color = color.bg;
+			b.style.backgroundColor = color.fg;
+			b.style.borderRadius = '9999px';
 			return b;
 		}),
 	);
