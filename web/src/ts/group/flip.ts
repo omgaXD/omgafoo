@@ -29,7 +29,7 @@ export function applyFLIP(newElement: HTMLElement, snapshot: FLIPSnapshot) {
 					offset: 0,
 				},
 			],
-			{ easing: "ease-in-out", duration: 200 },
+			{ easing: "ease-in-out", duration: 150 },
 		);
 	});
 }
