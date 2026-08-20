@@ -84,9 +84,12 @@ export function drawRadioGroup<T>(
 	groupName: string,
 	options: { value: T; name: string }[],
 	choice: (value: T) => void,
+	remember: boolean = false,
 ): HTMLElement[] {
 	const elements: HTMLElement[] = [];
-	for (const { value, name } of options) {
+	const memory = localStorage.getItem(`radioGroup-${groupName}-memory`);
+
+	options.forEach(({value, name}, i) => {
 		const label = document.createElement("label");
 		label.textContent = name;
 		label.classList.add("rect", "hover-highlight", "checked-highlight", "padded", "w-full");
@@ -99,11 +102,17 @@ export function drawRadioGroup<T>(
 
 		input.addEventListener("change", () => {
 			choice(value);
+			if (remember) {
+				localStorage.setItem(`radioGroup-${groupName}-memory`, i.toString());
+			}
 		});
 
-		elements.push(label);
-	}
+		if (memory !== null && parseInt(memory) === i) {input.checked = true; choice(value); }
 
+		elements.push(label);
+	});
+
+	
 	return elements;
 }
 

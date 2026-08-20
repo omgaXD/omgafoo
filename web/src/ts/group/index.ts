@@ -17,6 +17,7 @@ function main() {
 				cleanup?.();
 				cleanup = play(v);
 			},
+			true
 		),
 	);
 }
