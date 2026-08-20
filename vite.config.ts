@@ -17,6 +17,7 @@ export default defineConfig({
 				toneguessr: path.resolve(__dirname, "web/src/ts/toneguessr/index.ts"),
 				grid: path.resolve(__dirname, "web/src/ts/grid/index.ts"),
 				land: path.resolve(__dirname, "web/src/ts/land/index.ts"),
+				group: path.resolve(__dirname, "web/src/ts/group/index.ts"),
 			},
 		},
 	},
