@@ -33,7 +33,6 @@ function visualize<M, T extends number>({ modelDef, repr, mapper }: ModelControl
 		if (result.success) {
 			// re-render visualization
 			const visSnapshot = snapshotFLIP(visualization);
-			console.log(visSnapshot);
 			visualization.innerHTML = "";
 			visualization.appendChild(
 				repr.represent(modelDef.applyTransformation(modelDef.baseModel(), result.transformation), markFlip),
