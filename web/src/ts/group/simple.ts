@@ -31,9 +31,9 @@ export class SimpleModelDefinition implements ModelDefinition<Model, 4> {
 
 export class SimpleModelRepr implements ModelRepr<Model> {
 	represent(model: Model, identifyMovableNode: (el: HTMLElement, uniqueId: number) => void): HTMLElement {
-		const element = drawGrid(2);
+		const element = drawGrid(6);
 		for (const i of model) {
-			const sq = drawSquare(i.toString(), getColorFromIndex(i));
+			const sq = drawSquare(i.toString(), getColorFromIndex(i), 3, 2);
 			identifyMovableNode(sq, i);
 			element.appendChild(sq);
 		}
