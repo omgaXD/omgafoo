@@ -1,5 +1,5 @@
 import { ModelRepr } from "./dom";
-import { ModelDefinition } from "./math";
+import { ModelDefinition } from "./modelDefinition";
 import { TransformationMapper } from "./parse";
 import { RubikModelDefinition, RubikRepr, RubikMapper } from "./rubik";
 import { SimpleModelDefinition, SimpleModelRepr, SimpleRLUDMapper } from "./simple";

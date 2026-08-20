@@ -1,5 +1,5 @@
 import { drawEmptySquare, drawGrid, drawSquare, getColorFromIndex, ModelRepr } from "./dom";
-import { ModelDefinition } from "./math";
+import { ModelDefinition } from "./modelDefinition";
 import { TransformationMapper } from "./parse";
 
 type Side<N extends 2 | 3> = FixedArray<N, FixedArray<N, number>>;
@@ -97,7 +97,7 @@ export class RubikModelDefinition<N extends 2 | 3> implements ModelDefinition<Mo
 					// B
 					[0, 3, 1, 2],
 					[i, this.size - 1, this.size - i - 1, 0],
-					[this.size-1, this.size-i-1, 0, i]
+					[this.size - 1, this.size - i - 1, 0, i],
 				],
 			];
 			for (let j = 0; j < 3; j++) {

@@ -1,5 +1,5 @@
 import { drawGrid, drawSquare, getColorFromIndex, ModelRepr } from "./dom";
-import { ModelDefinition } from "./math";
+import { ModelDefinition } from "./modelDefinition";
 import { TransformationMapper } from "./parse";
 
 type Model = [number, number, number, number];
@@ -42,14 +42,14 @@ export class SimpleModelRepr implements ModelRepr<Model> {
 }
 
 export class SimpleRLUDMapper implements TransformationMapper<4> {
-    private map = ["r", "l", "u", "d"] as const;
+	private map = ["r", "l", "u", "d"] as const;
 	parseTransformationElement(_limit: 4, string: string): FixedNumber<4> | "none" | "error" {
 		if (string === "" || string === " ") return "none";
 		const index = this.map.findIndex((el) => el === string);
 		if (index === -1) return "error";
 		return index as FixedNumber<4>;
 	}
-    mapToStr(t: 0 | 1 | 2 | 3): string {
-        return this.map[t];
-    }
+	mapToStr(t: 0 | 1 | 2 | 3): string {
+		return this.map[t];
+	}
 }
