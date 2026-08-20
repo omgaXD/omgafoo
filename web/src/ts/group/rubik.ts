@@ -9,7 +9,17 @@ export class RubikModelDefinition<N extends 2 | 3> implements ModelDefinition<Mo
 	baseModel(): Model<N> {
 		return Array.from({ length: 6 }).map((_, i) => {
 			return Array.from({ length: this.size }).map((_, y) => {
-				return Array.from({ length: this.size }).map((_, x) => i + x * 6 + y * this.size * 6);
+				return Array.from({ length: this.size }).map((_, x) => {
+					// for a fancy FLIP, prefer corners for index
+					if (x === 0 && y === 0) return i;
+					if (x === this.size - 1 && y === 0) return i+6;
+					if (x === this.size - 1 && y === this.size-1) return i+12;
+					if (x === 0 && y === this.size - 1) return i+18;
+					x -= 1;
+					if (y > 0) x -= 4;
+					if (y === this.size - 1) x -= 4;
+					return i + x*6 + y*36 + 24;
+				});
 			});
 		}) as Model<N>;
 	}
@@ -104,45 +114,37 @@ export class RubikRepr<N extends 2 | 3> implements ModelRepr<Model<N>> {
 			element.append(e1, e2, e3, e4);
 		}
 
-		for (let y = 0; y < this.size; y++) {
-			for (let x = 0; x < this.size; x++) {
-				const el = drawSquare(m[2][y][x].toString(), getColorFromIndex(m[2][y][x]), 1, 1, x + this.size, y);
-				identifyMovableNode(el, m[2][y][x]);
-				element.appendChild(el);
-			}
-		}
+		this.drawFace(2, this.size, 0, m, element, identifyMovableNode);
+		this.drawFace(1, 0, this.size, m, element, identifyMovableNode);
+		this.drawFace(4, this.size, this.size, m, element, identifyMovableNode);
+		this.drawFace(0, this.size * 2, this.size, m, element, identifyMovableNode);
+		this.drawFace(5, this.size * 3, this.size, m, element, identifyMovableNode);
+		this.drawFace(3, this.size, this.size * 2, m, element, identifyMovableNode);
 
-		for (let y = 0; y < this.size; y++) {
-			for (let x = 0; x < this.size; x++) {
-				const el = drawSquare(m[1][y][x].toString(), getColorFromIndex(m[1][y][x]));
-				identifyMovableNode(el, m[1][y][x]);
-				element.appendChild(el);
-			}
-			for (let x = 0; x < this.size; x++) {
-				const el = drawSquare(m[4][y][x].toString(), getColorFromIndex(m[4][y][x]));
-				identifyMovableNode(el, m[4][y][x]);
-				element.appendChild(el);
-			}
-			for (let x = 0; x < this.size; x++) {
-				const el = drawSquare(m[0][y][x].toString(), getColorFromIndex(m[0][y][x]));
-				identifyMovableNode(el, m[0][y][x]);
-				element.appendChild(el);
-			}
-			for (let x = 0; x < this.size; x++) {
-				const el = drawSquare(m[5][y][x].toString(), getColorFromIndex(m[5][y][x]));
-				identifyMovableNode(el, m[5][y][x]);
-				element.appendChild(el);
-			}
-		}
-
-		for (let y = 0; y < this.size; y++) {
-			for (let x = 0; x < this.size; x++) {
-				const el = drawSquare(m[3][y][x].toString(), getColorFromIndex(m[3][y][x]));
-				identifyMovableNode(el, m[3][y][x]);
-				element.appendChild(el);
-			}
-		}
 		return element;
+	}
+	private drawFace(
+		face: number,
+		offsetX: number,
+		offsetY: number,
+		m: number[][][],
+		into: HTMLElement,
+		identifyMovableNode: (el: HTMLElement, uniqueId: number | string) => void,
+	) {
+		for (let y = 0; y < this.size; y++) {
+			for (let x = 0; x < this.size; x++) {
+				const el = drawSquare(
+					m[face][y][x].toString(),
+					getColorFromIndex(m[face][y][x]),
+					1,
+					1,
+					x + offsetX,
+					y + offsetY,
+				);
+				identifyMovableNode(el, m[face][y][x]);
+				into.appendChild(el);
+			}
+		}
 	}
 }
 

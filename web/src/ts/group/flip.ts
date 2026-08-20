@@ -13,6 +13,7 @@ export function snapshotFLIP(element: HTMLElement): FLIPSnapshot {
 	});
 }
 
+const easing: KeyframeAnimationOptions = { easing: "cubic-bezier(.36,1.02,.62,1.09)", duration: 300 };
 export function applyFLIP(newElement: HTMLElement, snapshot: FLIPSnapshot) {
 	[...newElement.querySelectorAll<HTMLElement>("[data-flip-id]")].map((el) => {
 		const rect = el.getBoundingClientRect();
@@ -29,11 +30,23 @@ export function applyFLIP(newElement: HTMLElement, snapshot: FLIPSnapshot) {
 					offset: 0,
 				},
 			],
-			{ easing: "ease-in-out", duration: 150 },
+			easing,
 		);
+		for (const child of el.children) {
+			child.animate(
+				[
+					{
+						transform: `scale(${1 / diffW}, ${1 / diffH})`,
+						offset: 0,
+					},
+				],
+				easing,
+			);
+		}
 	});
 }
 
 export function markFlip(element: HTMLElement, uniqueId: string | number) {
 	element.dataset.flipId = `${uniqueId}`;
+	element.style.transformOrigin = "left top";
 }
