@@ -1,0 +1,19 @@
+{{ define "head" }} {{ end }} {{ define "content" }}
+<div class="w-full p-4">
+	<div class="grid md:grid-cols-[2fr_1fr_1fr] gap-4 min-h-8">
+		<div class="rect padded round">
+			<h2>Visualization</h2>
+			<div id="visualization"></div>
+		</div>
+		<div class="rect padded round flex flex-col">
+			<h2>Sequence</h2>
+			<textarea id="sequence" class="w-full font-mono text-2xl h-full"></textarea>
+		</div>
+		<div class="rect padded round">
+			<h2>Groups</h2>
+			<div id="groups" class="flex flex-col gap-1 pb-2">
+			</div>
+		</div>
+	</div>
+</div>
+{{ end }}
