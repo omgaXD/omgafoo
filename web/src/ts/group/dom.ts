@@ -70,12 +70,12 @@ export function drawEmptySquare(
 export function getColorFromIndex(index: number): Color {
 	return (
 		[
-			{ bg: "red", fg: "black" },
-			{ bg: "orange", fg: "black" },
-			{ bg: "white", fg: "black" },
-			{ bg: "yellow", fg: "black" },
-			{ bg: "lime", fg: "black" },
-			{ bg: "blue", fg: "white" },
+			{ bg: "#ff2211", fg: "black" },
+			{ bg: "#ff8811", fg: "black" },
+			{ bg: "#ffffee", fg: "black" },
+			{ bg: "#fff811", fg: "black" },
+			{ bg: "#44ff11", fg: "black" },
+			{ bg: "#1122ff", fg: "white" },
 		] satisfies Color[]
 	)[index % 6];
 }

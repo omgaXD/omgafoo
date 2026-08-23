@@ -44,14 +44,17 @@ export function drawDifferenceOnCanvas(
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	for (const diff of differences) {
+		const dist = Math.hypot(diff.newX - diff.oldX, diff.newY - diff.oldY);
+		const opacity = Math.floor(Math.max(0, Math.min(1, (dist - 15) * 0.08) * 255));
+		const opacityString = opacity.toString(16).padStart(2, "0");
 		ctx.beginPath();
 		ctx.lineWidth = 8;
-		ctx.strokeStyle = 'black';
+		ctx.strokeStyle = "#000000" + opacityString;
 		drawArrow(diff, ctx, offsetX, offsetY);
 		ctx.stroke();
 		ctx.beginPath();
 		ctx.lineWidth = 3;
-		ctx.strokeStyle = getColorFromIndex(+diff.uniqueId).bg;
+		ctx.strokeStyle = getColorFromIndex(+diff.uniqueId).bg + opacityString;
 		drawArrow(diff, ctx, offsetX, offsetY);
 		ctx.stroke();
 	}
