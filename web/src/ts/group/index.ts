@@ -81,16 +81,25 @@ function visualize<M, T extends number>({ modelDef, repr, mapper }: ModelControl
 			}
 		}
 	}
-	const loop = () => requestAnimationFrame(() => {
-		recompare();
-		loop();
-	})
+
+	let running = true;
+	const loop = () =>
+		requestAnimationFrame(() => {
+			if (!running) return;
+			recompare();
+			loop();
+		});
 	loop();
 
 	seqEl.addEventListener("input", rerender);
 	compareSeqEl.addEventListener("input", rerender);
 	compareCheckbox.addEventListener("input", rerender);
-	return () => seqEl.removeEventListener("input", rerender);
+	return () => {
+		seqEl.removeEventListener("input", rerender);
+		compareSeqEl.removeEventListener("input", rerender);
+		compareCheckbox.removeEventListener("input", rerender);
+		running = false;
+	};
 }
 
 function play(key: keyof typeof controllers) {
