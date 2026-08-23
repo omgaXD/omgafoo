@@ -1,12 +1,26 @@
+import { calculateDifference, drawDifferenceOnCanvas } from "./compare";
 import { controllers, ModelController } from "./controller";
-import { drawMapper, drawRadioGroup } from "./dom";
-import { applyFLIP, markFlip, snapshotFLIP } from "./flip";
+import { drawMapper, drawRadioGroup, setupCanvas } from "./dom";
+import { applyFLIP } from "./flip";
 import { parseTransformation } from "./parse";
+import { markSnapshotable, takeVisSnapshot } from "./snapshot";
 
+const visualization = document.getElementById("visualization")!;
+const seqEl = document.getElementById("sequence") as HTMLTextAreaElement;
+const selectedGroupSummary = document.getElementById("selected-group")!;
+const groupsList = document.getElementById("groups")!;
+
+const compareVis = document.getElementById("visualization-compare")!;
+const compareCanvas = document.getElementById("compare-canvas") as HTMLCanvasElement;
+const compareCtx = compareCanvas.getContext("2d")!;
+const compareCheckbox = document.getElementById("do-compare") as HTMLInputElement;
+const compareSeqEl = document.getElementById("sequence-compare") as HTMLTextAreaElement;
+
+const resizeCanvas = setupCanvas(compareCanvas, visualization);
 function main() {
 	let cleanup: null | (() => void) = null;
 
-	document.getElementById("groups")!.append(
+	groupsList.append(
 		...drawRadioGroup<keyof typeof controllers>(
 			"controllers",
 			Object.entries(controllers).map(([k, v]) => ({
@@ -17,7 +31,7 @@ function main() {
 				cleanup?.();
 				cleanup = play(v);
 			},
-			true
+			true,
 		),
 	);
 }
@@ -25,20 +39,42 @@ function main() {
 main();
 
 function visualize<M, T extends number>({ modelDef, repr, mapper }: ModelController<M, T>): () => void {
-	const visualization = document.getElementById("visualization")!;
-	
-	const seqEl = document.getElementById("sequence")! as HTMLTextAreaElement;
 	function rerender() {
 		// re-parse transformation
 		const result = parseTransformation(mapper, seqEl.value);
 		if (result.success) {
-			// re-render visualization
-			const visSnapshot = snapshotFLIP(visualization);
+			// re-render visualization with FLIP
+			const visSnapshot = takeVisSnapshot(visualization);
 			visualization.innerHTML = "";
 			visualization.appendChild(
-				repr.represent(modelDef.applyTransformation(modelDef.baseModel(), result.transformation), markFlip),
+				repr.represent(
+					modelDef.applyTransformation(modelDef.baseModel(), result.transformation),
+					markSnapshotable,
+				),
 			);
-			if (visSnapshot.length > 0) applyFLIP(visualization, visSnapshot);
+			const newSnapshot = takeVisSnapshot(visualization);
+			if (compareCheckbox.checked === false) {
+				compareCtx.clearRect(0, 0, compareCanvas.width, compareCanvas.height);
+			} else {
+				const other = parseTransformation(mapper, compareSeqEl.value);
+
+				if (other.success) {
+					compareVis.innerHTML = "";
+					compareVis.appendChild(
+						repr.represent(
+							modelDef.applyTransformation(modelDef.baseModel(), other.transformation),
+							markSnapshotable,
+						),
+					);
+					const otherSnapshot = takeVisSnapshot(compareVis);
+					resizeCanvas();
+					drawDifferenceOnCanvas(compareCanvas, compareCtx, calculateDifference(otherSnapshot, newSnapshot));
+				} else {
+					console.error(other.errors.map((e) => e[1]).join("\n"));
+				}
+			}
+
+			applyFLIP(visualization, visSnapshot);
 		} else {
 			console.error(result.errors.map((e) => e[1]).join("\n"));
 		}
@@ -46,6 +82,8 @@ function visualize<M, T extends number>({ modelDef, repr, mapper }: ModelControl
 	rerender();
 
 	seqEl.addEventListener("input", rerender);
+	compareSeqEl.addEventListener("input", rerender);
+	compareCheckbox.addEventListener("input", rerender);
 	return () => seqEl.removeEventListener("input", rerender);
 }
 
@@ -63,9 +101,8 @@ function play(key: keyof typeof controllers) {
 }
 
 function playConcrete<M, T extends number>(controller: ModelController<M, T>) {
-	document.getElementById('selected-group-container')!.classList.remove('hidden');
-	const selGroup = document.getElementById('selected-group')!;
-	selGroup.innerHTML = '';
-	selGroup.appendChild(drawMapper<T>(controller.mapper));
+	document.getElementById("selected-group-container")!.classList.remove("hidden");
+	selectedGroupSummary.innerHTML = "";
+	selectedGroupSummary.appendChild(drawMapper<T>(controller.mapper));
 	return visualize(controller);
 }

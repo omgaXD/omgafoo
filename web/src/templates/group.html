@@ -1,13 +1,19 @@
 {{ define "head" }} {{ end }} {{ define "content" }}
 <div class="w-full p-4">
 	<div class="grid md:grid-cols-[2fr_1fr_1fr] gap-4 min-h-8">
-		<div class="rect padded round">
+		<div class="rect padded round relative pb-2">
 			<h3>Visualization</h3>
-			<div id="visualization" class="pb-2"></div>
+			<div class="relative">
+				<div id="visualization"></div>
+				<div id="visualization-compare" class="absolute top-0 left-0 w-full h-full invisible"></div>
+				<canvas id="compare-canvas" class="absolute top-0 left-0 z-10"></canvas>
+			</div>
 		</div>
 		<div class="rect padded round flex flex-col">
 			<h3>Sequence</h3>
-			<textarea id="sequence" class="w-full font-mono text-2xl h-full"></textarea>
+			<textarea id="sequence" class="w-full font-mono text-2xl flex-1"></textarea>
+			<h3><input type="checkbox" id="do-compare" class="mr-2" />Compare to source</h3>
+			<textarea id="sequence-compare" class="w-full font-mono text-2xl flex-1"></textarea>
 		</div>
 		<div class="rect padded round">
 			<h3>Groups</h3>

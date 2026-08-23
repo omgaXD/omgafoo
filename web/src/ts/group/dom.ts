@@ -135,9 +135,19 @@ export function drawMapper<T extends number>(mapper: FiniteTransformationMapper<
 			const color = getColorFromIndex(i);
 			b.style.color = color.bg;
 			b.style.backgroundColor = color.fg;
-			b.style.borderRadius = '9999px';
+			b.style.borderRadius = "9999px";
 			return b;
 		}),
 	);
 	return element;
+}
+
+export function setupCanvas(canvas: HTMLCanvasElement, fitTo: HTMLElement): () => void {
+	function resize() {
+		const { width, height } = fitTo.getBoundingClientRect();
+		canvas.width = width;
+		canvas.height = height;
+	}
+	resize();
+	return resize;
 }
