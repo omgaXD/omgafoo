@@ -8,8 +8,6 @@ export function drawGrid(cols: number): HTMLElement {
 	const element = document.createElement("div");
 	element.style.display = "grid";
 	element.style.gridTemplateColumns = `repeat(${cols},1fr)`;
-	element.style.gap = "10px";
-
 	return element;
 }
 
@@ -31,14 +29,12 @@ export function drawSquare(
 	element.style.display = "flex";
 	element.style.backgroundColor = bg;
 	element.style.color = fg;
-	element.style.width = "100%";
 	element.style.aspectRatio = `${colSpan / rowSpan}`;
 	if (x !== undefined) element.style.gridColumnStart = (x + 1).toString();
 	if (y !== undefined) element.style.gridRowStart = (y + 1).toString();
 	element.style.gridColumnEnd = `span ${colSpan}`;
 	element.style.gridRowEnd = `span ${rowSpan}`;
 	element.style.borderRadius = "10px";
-	element.style.fontSize = "40px";
 	const p = document.createElement("p")!;
 	p.style.margin = "auto";
 	p.textContent = `${content}`;
@@ -53,7 +49,6 @@ export function drawEmptySquare(
 	y: number | undefined = undefined,
 ) {
 	const element = document.createElement("div");
-	element.style.width = "100%";
 	element.style.aspectRatio = `${colSpan / rowSpan}`;
 	if (x) element.style.gridColumnStart = (x + 1).toString();
 	if (y) element.style.gridRowStart = (y + 1).toString();
