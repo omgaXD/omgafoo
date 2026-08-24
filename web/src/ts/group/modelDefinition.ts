@@ -1,3 +1,5 @@
+import { FixedNumber } from "./numberType";
+
 export interface ModelDefinition<M, T extends number> {
 	baseModel(): M;
 	applyTransformation(model: M, transformation: FixedNumber<T>[]): M;

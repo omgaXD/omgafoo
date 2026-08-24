@@ -1,3 +1,5 @@
+import { FixedArray, FixedNumber } from "./numberType";
+
 export function parseTransformation<T extends number>(
 	mapper: FiniteTransformationMapper<T>,
 	text: string,

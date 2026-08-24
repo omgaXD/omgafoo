@@ -1,5 +1,6 @@
 import { drawEmptySquare, drawGrid, drawSquare, getColorFromIndex, ModelRepr } from "./dom";
 import { ModelDefinition } from "./modelDefinition";
+import { FixedArray, FixedNumber } from "./numberType";
 import { FiniteTransformationMapper } from "./parse";
 
 type Side<N extends 2 | 3> = FixedArray<N, FixedArray<N, number>>;

@@ -1,5 +1,6 @@
 import { drawGrid, drawSquare, getColorFromIndex, ModelRepr } from "./dom";
 import { ModelDefinition } from "./modelDefinition";
+import { FixedArray } from "./numberType";
 import { FiniteTransformationMapper } from "./parse";
 
 type Model = [number, number, number, number];
