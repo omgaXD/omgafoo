@@ -1,17 +1,26 @@
 @layer base {
-    body > header {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        > * {
-            display: flex;
-            align-items: center;
-            padding: var(--space-2) var(--space-4);
-            gap: var(--space-6);
-            img {
-                height: var(--space-12);
-            }
-        }
-    }
+	body > header {
+        overflow-x: scroll;
+        > div {
+            min-width: 100%;
+			width: fit-content;
+			display: flex;
+			align-items: center;
+			> * {
+				display: flex;
+				width: fit-content;
+				align-items: center;
+				padding: var(--space-2) var(--space-4);
+				gap: var(--space-6);
+				flex-shrink: 0;
+				> * {
+					min-width: 0;
+					width: fit-content;
+				}
+				img {
+					height: var(--space-12);
+				}
+			}
+		}
+	}
 }

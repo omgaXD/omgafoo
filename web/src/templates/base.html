@@ -11,22 +11,24 @@
 	</head>
 	<body>
 		<header>
-			<div class="right">
-				<img src="/static/assets/img/image.png" alt="Logo" class="logo" />
-				<a href="/" class='pretty-link {{ if eq .Page "/" }} on-this-page {{ end }}'>Index</a>
-				<a href="/prismanis" class='pretty-link {{ if eq .Page "/prismanis" }} on-this-page {{ end }}'>Prismanis</a>
-				<a href="/cards" class='pretty-link {{ if eq .Page "/cards" }} on-this-page {{ end }}'>Cards</a>
-				<a href="/toneguessr" class='pretty-link {{ if eq .Page "/toneguessr" }} on-this-page {{ end }}'>Toneguessr</a>
-				<a href="/grid" class='pretty-link {{ if eq .Page "/grid" }} on-this-page {{ end }}'>Grid</a>
-				<a href="/land" class='pretty-link {{ if eq .Page "/land" }} on-this-page {{ end }}'>Land</a>
-				<a href="/group" class='pretty-link {{ if eq .Page "/group" }} on-this-page {{ end }}'>Group</a>
-			</div>
-			<div class="left">
-				<a href="https://github.com/omgaXD/omgafoo" target="_blank">
-					<i class="lab la-github la-3x"></i>
-				</a>
+			<div>
+				<div>
+					<img src="/static/assets/img/image.png" alt="Logo" class="logo" />
+					<a href="/" class='pretty-link {{ if eq .Page "/" }} on-this-page {{ end }}'>Index</a>
+					<a href="/prismanis" class='pretty-link {{ if eq .Page "/prismanis" }} on-this-page {{ end }}'>Prismanis</a>
+					<a href="/cards" class='pretty-link {{ if eq .Page "/cards" }} on-this-page {{ end }}'>Cards</a>
+					<a href="/toneguessr" class='pretty-link {{ if eq .Page "/toneguessr" }} on-this-page {{ end }}'>Toneguessr</a>
+					<a href="/grid" class='pretty-link {{ if eq .Page "/grid" }} on-this-page {{ end }}'>Grid</a>
+					<a href="/land" class='pretty-link {{ if eq .Page "/land" }} on-this-page {{ end }}'>Land</a>
+					<a href="/group" class='pretty-link {{ if eq .Page "/group" }} on-this-page {{ end }}'>Group</a>
+				</div>
+				<div class="ml-auto">
+					<a href="https://github.com/omgaXD/omgafoo" target="_blank">
+						<i class="lab la-github la-3x"></i>
+					</a>
+				</div>
 			</div>
 		</header>
-		{{ template "content" . }}
+		<div class="w-screen overflow-x-scroll">{{ template "content" . }}</div>
 	</body>
 </html>
