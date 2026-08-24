@@ -9,15 +9,25 @@
 				<canvas id="compare-canvas" class="absolute top-0 left-0 z-10"></canvas>
 			</div>
 		</div>
-		<div class="rect padded round flex flex-col">
+		<div class="rect padded round flex flex-col pb-2">
 			<h3>Sequence</h3>
-			<textarea id="sequence" class="w-full font-mono text-2xl flex-1"></textarea>
-			<h3><label><input type="checkbox" id="do-compare" class="mr-2" />Compare to source</label></h3>
-			<textarea id="sequence-compare" class="w-full font-mono text-2xl flex-1"></textarea>
+			<textarea
+				id="sequence"
+				class="w-full font-mono text-2xl flex-1"
+				placeholder="use allowed tokens from the 'selected group' menu!"
+			></textarea>
+			<h3>
+				<label><input type="checkbox" id="do-compare" class="mr-2" />Compare to source</label>
+			</h3>
+			<textarea
+				id="sequence-compare"
+				class="w-full font-mono text-2xl flex-1"
+				placeholder="compare to this as a source"
+			></textarea>
 		</div>
 		<div class="rect padded round">
 			<h3>Groups</h3>
-			<div id="groups" class="flex flex-col gap-1 pb-2"></div>
+			<div id="groups" class="flex flex-col gap-1 pb-2 focus-within:outline-1"></div>
 			<div id="selected-group-container" class="hidden">
 				<hr />
 				<h3>Selected group</h3>
