@@ -11,11 +11,10 @@ export function parseLetterCoord(coord: string): number {
 }
 
 export function toLetterCoord(coord: number): string {
-    if (coord === 0) return 'a';
     let result = "";
-    while (coord > 0) {
+    while (coord >= 0) {
         const rem = coord % alphabet;
-        coord = Math.floor(coord / alphabet);
+        coord = Math.floor(coord / alphabet - 1);
         result = String.fromCharCode(rem + 'a'.charCodeAt(0)) + result;
     }
     return result;
