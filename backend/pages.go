@@ -47,6 +47,11 @@ func servePages() {
 			"ViteHead": generateViteTags("ts/main.ts", "ts/group/index.ts"),
 		}
 	})
+	registerPage("/sdf", []string{"base.html", "sdf.html"}, func(r *http.Request) map[string]any {
+		return map[string]any{
+			"ViteHead": generateViteTags("ts/main.ts", "ts/sdf/index.ts"),
+		}
+	})
 }
 
 func registerPage(path string, templateFiles []string, dataFunc DataProviderFunc) {

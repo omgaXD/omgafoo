@@ -1,0 +1,14 @@
+{{ define "head" }} {{ end }} {{ define "content" }}
+<div class="w-full p-4">
+	<div class="grid grid-cols-[1fr_2fr] gap-4">
+		<div class="rect padded round pb-2">
+			<h3>Visualization</h3>
+			<div class="w-full aspect-square"><canvas id="canvas"></canvas></div>
+		</div>
+		<div class="rect padded round flex flex-col pb-2">
+			<h3>Sequence</h3>
+			<textarea id="sequence" class="w-full font-mono text-2xl flex-1"></textarea>
+		</div>
+	</div>
+</div>
+{{ end }}

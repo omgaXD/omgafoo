@@ -18,6 +18,7 @@ export default defineConfig({
 				grid: path.resolve(__dirname, "web/src/ts/grid/index.ts"),
 				land: path.resolve(__dirname, "web/src/ts/land/index.ts"),
 				group: path.resolve(__dirname, "web/src/ts/group/index.ts"),
+				sdf: path.resolve(__dirname, "web/src/ts/sdf/index.ts"),
 			},
 		},
 	},
