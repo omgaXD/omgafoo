@@ -118,6 +118,11 @@ function play(key: keyof typeof controllers) {
 function playConcrete<M, T extends number>(controller: ModelController<M, T>) {
 	document.getElementById("selected-group-container")!.classList.remove("hidden");
 	selectedGroupSummary.innerHTML = "";
-	selectedGroupSummary.appendChild(drawMapper<T>(controller.mapper));
+	selectedGroupSummary.appendChild(
+		drawMapper<T>(controller.mapper, (token) => {
+			seqEl.value += token;
+			seqEl.dispatchEvent(new Event("input", { bubbles: true }));
+		}),
+	);
 	return visualize(controller);
 }

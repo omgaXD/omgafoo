@@ -113,24 +113,25 @@ export function drawRadioGroup<T>(
 	return elements;
 }
 
-export function drawMapper<T extends number>(mapper: FiniteTransformationMapper<T> | null): HTMLElement {
+export function drawMapper<T extends number>(mapper: FiniteTransformationMapper<T> | null, appendToTextarea?: (token: string) => void): HTMLElement {
 	const element = document.createElement("div");
 	if (mapper === null) return element;
 	const separator = mapper.tokenSeparator();
 	const separatorStr = separator === "" ? "None" : `"${separator}"`;
 	element.innerHTML = /*html*/ `
 		Separator: ${separatorStr}<br />
-		Valid tokens: <p class="valid-tokens mt-1"></p>
+		Valid tokens: <div class="valid-tokens mt-1 flex gap-3"></div>
 	`;
 	element.querySelector(".valid-tokens")!.append(
 		...(mapper.getValidTokens() as string[]).map((t, i) => {
-			const b = document.createElement("tt");
+			const b = document.createElement("button");
 			b.textContent = t;
-			b.classList.add("text-4xl", "mr-2", "p-0.5");
+			b.classList.add("text-4xl", "p-0.5", "font-mono", "cursor-pointer");
 			const color = getColorFromIndex(i);
 			b.style.color = color.bg;
 			b.style.backgroundColor = color.fg;
 			b.style.borderRadius = "9999px";
+			b.addEventListener('click', () => appendToTextarea?.(t + mapper.tokenSeparator()));
 			return b;
 		}),
 	);
