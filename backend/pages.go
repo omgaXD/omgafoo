@@ -3,7 +3,6 @@ package main
 import (
 	"html/template"
 	"log"
-	"maps"
 	"net/http"
 	"path/filepath"
 )
@@ -16,45 +15,17 @@ type Page struct {
 }
 
 func servePages() {
-	registerPage("/", []string{"base.html", "index.html"}, func(r *http.Request) map[string]any { return map[string]any{} })
-	registerPage("/prismanis", []string{"base.html", "prismanis.html"}, func(r *http.Request) map[string]any {
-		return map[string]any{
-			"ViteHead": generateViteTags("ts/main.ts", "ts/prismanis/index.ts"),
-		}
-	})
-	registerPage("/cards", []string{"base.html", "cards.html"}, func(r *http.Request) map[string]any {
-		return map[string]any{
-			"ViteHead": generateViteTags("ts/main.ts", "ts/cards/index.ts"),
-		}
-	});
-	registerPage("/toneguessr", []string{"base.html", "toneguessr.html"}, func(r *http.Request) map[string]any {
-		return map[string]any{
-			"ViteHead": generateViteTags("ts/main.ts", "ts/toneguessr/index.ts"),
-		}
-	})
-	registerPage("/grid", []string{"base.html", "grid.html"}, func(r *http.Request) map[string]any {
-		return map[string]any{
-			"ViteHead": generateViteTags("ts/main.ts", "ts/grid/index.ts"),
-		}
-	})
-	registerPage("/land", []string{"base.html", "land.html"}, func(r *http.Request) map[string]any {
-		return map[string]any{
-			"ViteHead": generateViteTags("ts/main.ts", "ts/land/index.ts"),
-		}
-	})
-	registerPage("/group", []string{"base.html", "group.html"}, func(r *http.Request) map[string]any {
-		return map[string]any{
-			"ViteHead": generateViteTags("ts/main.ts", "ts/group/index.ts"),
-		}
-	})
-	registerPage("/sdf", []string{"base.html", "sdf.html"}, func(r *http.Request) map[string]any {
-		return map[string]any{
-			"ViteHead": generateViteTags("ts/main.ts", "ts/sdf/index.ts"),
-		}
-	})
+	registerPage("/", []string{"base.html", "index.html"}, []string{})
+	registerPage("/prismanis", []string{"base.html", "prismanis.html"}, []string{"ts/prismanis/index.ts"})
+	registerPage("/cards", []string{"base.html", "cards.html"}, []string{"ts/cards/index.ts"});
+	registerPage("/toneguessr", []string{"base.html", "toneguessr.html"}, []string{"ts/toneguessr/index.ts"})
+	registerPage("/grid", []string{"base.html", "grid.html"}, []string{"ts/grid/index.ts"})
+	registerPage("/land", []string{"base.html", "land.html"}, []string{"ts/land/index.ts"})
+	registerPage("/group", []string{"base.html", "group.html"}, []string{"ts/group/index.ts"})
+	registerPage("/sdf", []string{"base.html", "sdf.html"}, []string{"ts/sdf/index.ts"})
 }
 
-func registerPage(path string, templateFiles []string, dataFunc DataProviderFunc) {
+func registerPage(path string, templateFiles []string, tsFiles []string) {
 	config := GetConfig()
 
 	http.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
@@ -75,19 +46,14 @@ func registerPage(path string, templateFiles []string, dataFunc DataProviderFunc
 		}
 
 		data := map[string]any{
-			"ViteHead": generateViteTags("ts/main.ts"),
+			"ViteHead": generateViteTags(append([]string{"ts/index.ts"}, tsFiles... )),
 			"IsDev":    config.IsDev,
 			"Page":     path,
 			"Protocol": protocol,
 			"Host":     r.Host,
 		}
 
-		if dataFunc != nil {
-			pageData := dataFunc(r)
-			maps.Copy(data, pageData)
-		}
-
-		err = tmpl.ExecuteTemplate(w, "base.html", data)
+		err = tmpl.ExecuteTemplate(w, templateFiles[0], data)
 		if err != nil {
 			log.Printf("Template execution error: %v", err)
 		}

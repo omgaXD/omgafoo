@@ -35,7 +35,7 @@ func loadManifest(path string, into *map[string]ManifestEntry) {
 	}
 }
 
-func generateViteTags(entryPoints ...string) template.HTML {
+func generateViteTags(entryPoints []string) template.HTML {
 	var html string
 	config := GetConfig()	
 

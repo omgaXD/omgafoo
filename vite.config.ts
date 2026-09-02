@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import path from "path";
+import { globSync } from "fs";
 
 export default defineConfig({
 	root: "web/src",
@@ -9,17 +10,8 @@ export default defineConfig({
 		outDir: "../out",
 		emptyOutDir: true,
 		manifest: true,
-		rollupOptions: {
-			input: {
-				main: path.resolve(__dirname, "web/src/ts/main.ts"),
-				prismanis: path.resolve(__dirname, "web/src/ts/prismanis/index.ts"),
-				cards: path.resolve(__dirname, "web/src/ts/cards/index.ts"),
-				toneguessr: path.resolve(__dirname, "web/src/ts/toneguessr/index.ts"),
-				grid: path.resolve(__dirname, "web/src/ts/grid/index.ts"),
-				land: path.resolve(__dirname, "web/src/ts/land/index.ts"),
-				group: path.resolve(__dirname, "web/src/ts/group/index.ts"),
-				sdf: path.resolve(__dirname, "web/src/ts/sdf/index.ts"),
-			},
+		rolldownOptions: {
+			input: globSync('web/src/ts/**/index.ts')
 		},
 	},
 	plugins: [
@@ -37,7 +29,7 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: {
-			"@": path.resolve(__dirname, "./web/src"),
+			"@": path.resolve(import.meta.dirname, "./web/src"),
 		},
 	},
 });
