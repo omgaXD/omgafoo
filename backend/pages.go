@@ -16,13 +16,18 @@ type Page struct {
 
 func servePages() {
 	registerPage("/", []string{"base.html", "index.html"}, []string{})
-	registerPage("/prismanis", []string{"base.html", "prismanis.html"}, []string{"ts/prismanis/index.ts"})
-	registerPage("/cards", []string{"base.html", "cards.html"}, []string{"ts/cards/index.ts"});
-	registerPage("/toneguessr", []string{"base.html", "toneguessr.html"}, []string{"ts/toneguessr/index.ts"})
-	registerPage("/grid", []string{"base.html", "grid.html"}, []string{"ts/grid/index.ts"})
-	registerPage("/land", []string{"base.html", "land.html"}, []string{"ts/land/index.ts"})
-	registerPage("/group", []string{"base.html", "group.html"}, []string{"ts/group/index.ts"})
-	registerPage("/sdf", []string{"base.html", "sdf.html"}, []string{"ts/sdf/index.ts"})
+
+	registerPageSimple("prismanis")
+	registerPageSimple("cards")
+	registerPageSimple("toneguessr")
+	registerPageSimple("grid")
+	registerPageSimple("land")
+	registerPageSimple("group")
+	registerPageSimple("sdf")
+}
+
+func registerPageSimple(name string) {
+	registerPage("/" + name, []string{"base.html", name + ".html"}, []string{"ts/" + name + "/index.ts"})
 }
 
 func registerPage(path string, templateFiles []string, tsFiles []string) {
