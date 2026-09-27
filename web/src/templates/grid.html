@@ -1,11 +1,18 @@
 {{ define "head" }} {{ end }} {{ define "content" }}
-<div class="flex flex-col items-center">
-	<div class="flex flex-col w-full h-full gap-4 pb-4 max-w-lg pt-4">
+<div class="flex flex-col items-center p-4">
+	<div class="flex flex-col w-full h-full gap-4 pb-4 max-w-lg pt-4 rect padded round">
 		<label class="flex items-center gap-3 text-base">
 			<span class="form-label">Grid size</span>
 			<input type="number" id="size-input" value="6" min="2" max="12" class="rect round padded w-20" />
 		</label>
 		<canvas id="canvas" width="800" height="800"></canvas>
+		<p class="hint-text">
+			Imagine you're a bored chess king.<br>
+			You start in the top left corner of an N&times;N board, 
+			and you do the usual chess king moves, but you never do the same move twice in a row.<br>
+			For which N can you come back to the corner that you've started from,
+			visiting every other tile exactly once?
+		</p>
 	</div>
 </div>
 {{ end }}
