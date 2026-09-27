@@ -18,7 +18,7 @@ func servePages() {
 	registerPage("/", []string{"base.html", "index.html"}, []string{})
 
 	registerPageSimple("prismanis")
-	registerPageSimple("cards")
+	registerPageSimple("petrify")
 	registerPageSimple("toneguessr")
 	registerPageSimple("king")
 	registerPageSimple("land")
