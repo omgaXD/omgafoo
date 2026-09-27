@@ -20,7 +20,7 @@ func servePages() {
 	registerPageSimple("prismanis")
 	registerPageSimple("cards")
 	registerPageSimple("toneguessr")
-	registerPageSimple("grid")
+	registerPageSimple("king")
 	registerPageSimple("land")
 	registerPageSimple("group")
 	registerPageSimple("sdf")
